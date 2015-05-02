@@ -43,15 +43,23 @@ package
 			_renderer = new Renderer( _canvas );
 			
 			// list of 3d vectors, x, y, and color
-			var points:Vector.<Vector3D> = new <Vector3D>
+			var tri1:Vector.<Vector3D> = new <Vector3D>
 			[
 				new Vector3D( 50, 50, 0xFF0000 ),
 				new Vector3D( 150, 100, 0x00FF00 ),
 				new Vector3D( 50, 150, 0xFF0000 )
 			];
-			_renderer.render( points );
-			
-			//_canvas.fillRect( new Rectangle(50, 50, 150, 150), 0xFF0000 );
+			_renderer.render( tri1 );
+
+			// list of 3d vectors, x, y, and color
+			var tri2:Vector.<Vector3D> = new <Vector3D>
+			[
+				new Vector3D( 150, 50, 0xFF0000 ),
+				new Vector3D( 200, 100, 0x00FF00 ),
+				new Vector3D( 150, 150, 0xFF0000 )
+			];
+
+			_renderer.render( tri2 );
 		}
 	}
 }

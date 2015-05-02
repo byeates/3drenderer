@@ -37,7 +37,7 @@ package
 				return;
 			}
 			
-			canvas.fillRect( canvas.rect, 0 );
+			//canvas.fillRect( canvas.rect, 0 );
 			
 			var firstPass:Boolean;
 			triangle.sort( sortByHeight );
@@ -46,33 +46,31 @@ package
 			var sy:Number = triangle[0].y;
 			var height:Number = triangle[2].y - sy;
 			
-			// x = cos( a/h )
+			var sstepX:Number = ( triangle[2].x - sx ) / height;
+			var endstepX:Number = (triangle[1].x - sx )/(triangle[1].y - sy);
 			
-			var ac:Point = new Point( height, triangle[2].x - sx );
-			var ab:Number = Math.atan2( triangle[1].y - sy, triangle[1].x - sx );
-			
-			var endX:Number = sx + Math.cos( ab );
-			var endY:Number = sy + Math.sin( ab );
+			var endX:Number = sx;
+			var endY:Number = sy;
 			while( sy < triangle[2].y )
 			{
-				sx += Math.cos( ac );
-				sy += Math.sin( ac );
+				sx += sstepX;
+				sy += 1;
 				
-				endX += Math.cos( ab );
-				endY += Math.sin( ab );
-				
+				endX += endstepX;
+				endY +=1;
+
+				// rounding this for the loop
 				var dist:int = Math.ceil(endX - sx);
 				while( dist != 0 )
 				{
 					// setting this statically to red for now
-					trace( "setting pixel: " + (sx + dist), sy );
 					canvas.setPixel( sx + dist, sy, 0xFF0000 );
 					dist += dist < 0 ? 1 : -1;
 				}
 				
 				if ( sy >= triangle[1].y && !firstPass )
 				{
-					ab = Math.atan2( triangle[2].y - triangle[1].y, triangle[2].x - triangle[1].x );
+					endstepX = ( triangle[2].x - triangle[1].x )/( triangle[2].y - triangle[1].y );
 					firstPass = true;
 				}
 			}
