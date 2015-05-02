@@ -44,10 +44,9 @@ package
 			
 			var sx:Number = triangle[0].x;
 			var sy:Number = triangle[0].y;
-			var height:Number = triangle[2].y - sy;
-			
-			var sstepX:Number = ( triangle[2].x - sx ) / height;
-			var endstepX:Number = (triangle[1].x - sx )/(triangle[1].y - sy);
+
+			var sstepX:Number = ( triangle[2].x - sx ) / (triangle[2].y - sy);
+			var endstepX:Number = (triangle[1].x - sx ) / (triangle[1].y - sy);
 			
 			var endX:Number = sx;
 			var endY:Number = sy;
@@ -57,7 +56,7 @@ package
 				sy += 1;
 				
 				endX += endstepX;
-				endY +=1;
+				endY += 1;
 
 				// rounding this for the loop
 				var dist:int = Math.ceil(endX - sx);
@@ -70,7 +69,7 @@ package
 				
 				if ( sy >= triangle[1].y && !firstPass )
 				{
-					endstepX = ( triangle[2].x - triangle[1].x )/( triangle[2].y - triangle[1].y );
+					endstepX = ( triangle[2].x - triangle[1].x ) / ( triangle[2].y - triangle[1].y );
 					firstPass = true;
 				}
 			}
