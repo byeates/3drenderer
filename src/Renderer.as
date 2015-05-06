@@ -2,7 +2,6 @@ package
 {
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
-	import flash.geom.Vector3D;
 	
 	
 	/**
@@ -37,6 +36,7 @@ package
 			}
 			
 			var firstPass:Boolean;
+			var shapeWidth:Number = getWidth( triangle );
 			triangle.sort( sortByHeight );
 			
 			var sx:Number = triangle[0].x;
@@ -69,6 +69,11 @@ package
 			bvd.green = triangle[0].green;
 			bvd.blue = triangle[0].blue;
 			
+			var ustep:Number = (triangle[1].u - triangle[0].u) / shapeWidth;
+			var vstep:Number = (triangle[2].v - triangle[0].v) / acheight;
+			var u:Number = triangle[0].u;
+			var v:Number = triangle[0].v;
+			
 			while( sy < triangle[2].y )
 			{
 				sx += acstepX;
@@ -99,16 +104,25 @@ package
 				xvd.green = cvd.green;
 				xvd.blue = cvd.blue;
 				
+				y += vstep;
+				
 				var i:int = 0;
 				while( i < dist )
 				{
+					u += ustep;
 					// setting this statically to red for now
-					canvas.setPixel( sx + i, sy, toUint( xvd ) );
+					var color:Number = triangle[0].getUVPixel( u + ustep, v );
+					canvas.setPixel( sx + i, sy, color );
 					++i;
 					
 					xvd.red += rx;
 					xvd.green += gx;
 					xvd.blue += bx;
+				}
+				
+				if ( i > 0 )
+				{
+					u -= ustep * i;
 				}
 				
 				if ( sy >= triangle[1].y && !firstPass )
@@ -119,6 +133,11 @@ package
 					abstepRed = ( triangle[2].red - triangle[1].red ) / h;
 					abstepGreen = ( triangle[2].green - triangle[1].green ) / h;
 					abstepBlue = ( triangle[2].blue - triangle[1].blue ) / h;
+					
+					ustep = (triangle[1].u - triangle[2].u) / shapeWidth;
+					vstep = (triangle[1].v - triangle[2].v) / h;
+					u = triangle[1].u;
+					v = triangle[1].v;
 				}
 			}
 		}
@@ -129,12 +148,24 @@ package
 			return a.y - b.y;
 		}
 		
+		/** sorting method for returning vector ordered by y position low to high */
+		protected function sortByWidth( a:VertexData, b:VertexData ):Number
+		{
+			return a.x - b.x;
+		}
+		
 		protected function toUint( vertex:VertexData ):uint
 		{
 			var r:Number = ( vertex.red * 255 ) << 16;
 			var g:Number = ( vertex.green * 255 ) << 8;
 			var b:Number = vertex.blue * 255;
 			return r + g + b;
+		}
+		
+		protected function getWidth( triangle:Vector.<VertexData> ):Number
+		{
+			triangle.sort( sortByWidth );
+			return triangle[2].x - triangle[0].x;
 		}
 	}
 }

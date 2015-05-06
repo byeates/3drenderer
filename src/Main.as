@@ -58,8 +58,12 @@ package
 			var c:VertexData = new VertexData( 50, stage.stageHeight-50, 0 );
 			
 			a.setColorData( 1, 0, 0 );
-			b.setColorData( 0, 1, 0 );
+			b.setColorData( 1, 0, 0 );
 			c.setColorData( 0, 0, 1 );
+			
+			a.setUV( Textures.getMap( "brick" ) );
+			b.setUV( Textures.getMap( "brick" ), 1, 0.5 );
+			c.setUV( Textures.getMap( "brick" ), 0, 1 );
 			
 			// list of 3d vectors, x, y, z, and color
 			var tri1:Vector.<VertexData> = new <VertexData>[ a, b, c ];
