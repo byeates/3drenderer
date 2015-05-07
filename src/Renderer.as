@@ -2,6 +2,7 @@ package
 {
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
+	import flash.geom.Point;
 	
 	
 	/**
@@ -69,10 +70,11 @@ package
 			bvd.green = triangle[0].green;
 			bvd.blue = triangle[0].blue;
 			
-			var ustep:Number = (triangle[1].u - triangle[0].u) / shapeWidth;
-			var vstep:Number = (triangle[2].v - triangle[0].v) / acheight;
-			var u:Number = triangle[0].u;
-			var v:Number = triangle[0].v;
+			var uvstepleft:Point = new Point( (triangle[2].u - triangle[0].u) / acheight, (triangle[2].v - triangle[0].v) / acheight );
+			var uvleft:Point = new Point( triangle[0].u, triangle[0].v ); 
+			
+			var uvstepright:Point = new Point( (triangle[1].u - triangle[0].u) / abheight, (triangle[1].v - triangle[0].v) / abheight );
+			var uvright:Point = new Point( triangle[0].u, triangle[0].v );
 			
 			while( sy < triangle[2].y )
 			{
@@ -90,9 +92,18 @@ package
 				bvd.green += abstepGreen;
 				bvd.blue += abstepBlue;
 				
+				// uv steps
+				uvleft.x += uvstepleft.x;
+				uvleft.y += uvstepleft.y;
+				
+				uvright.x += uvstepright.x;
+				uvright.y += uvstepright.y;
+				
 				// rounding this for the loop
 				var dist:int = Math.ceil(endX - sx);
 				var w:Number = sx + dist;
+				
+				
 				
 				// steps across
 				var rx:Number = (bvd.red - cvd.red) / w; 
@@ -104,25 +115,26 @@ package
 				xvd.green = cvd.green;
 				xvd.blue = cvd.blue;
 				
-				y += vstep;
+				
+				// steps across uv
+				var uvx:Number = (uvright.x - uvleft.x) / dist;
+				var uvy:Number = (uvright.y - uvleft.y) / dist;
+				var uv:Point = new Point( uvleft.x, uvleft.y );
 				
 				var i:int = 0;
 				while( i < dist )
 				{
-					u += ustep;
 					// setting this statically to red for now
-					var color:Number = triangle[0].getUVPixel( u + ustep, v );
+					var color:Number = triangle[0].getUVPixel( uv.x, uv.y );
 					canvas.setPixel( sx + i, sy, color );
 					++i;
 					
 					xvd.red += rx;
 					xvd.green += gx;
 					xvd.blue += bx;
-				}
-				
-				if ( i > 0 )
-				{
-					u -= ustep * i;
+					
+					uv.x += uvx;
+					uv.y += uvy;
 				}
 				
 				if ( sy >= triangle[1].y && !firstPass )
@@ -134,10 +146,8 @@ package
 					abstepGreen = ( triangle[2].green - triangle[1].green ) / h;
 					abstepBlue = ( triangle[2].blue - triangle[1].blue ) / h;
 					
-					ustep = (triangle[1].u - triangle[2].u) / shapeWidth;
-					vstep = (triangle[1].v - triangle[2].v) / h;
-					u = triangle[1].u;
-					v = triangle[1].v;
+					uvstepright = new Point( (triangle[2].u - triangle[1].u) / h, (triangle[2].v - triangle[1].v) / h );
+					uvright = new Point( triangle[1].u, triangle[1].v );
 				}
 			}
 		}
