@@ -119,6 +119,17 @@ package
 					tri2[2].x -= MOVE_PIXELS_BY;
 					redraw();
 					break;
+				
+				case Keyboard.W:
+					_renderer.addAmbience();
+					redraw();
+					break;
+				
+				case Keyboard.S:
+					_renderer.addAmbience( -0.1 );
+					redraw();
+					break;
+					
 			}
 		}
 		

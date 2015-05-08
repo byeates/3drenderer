@@ -3,6 +3,7 @@ package
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
 	import flash.geom.Point;
+	import flash.geom.Vector3D;
 	
 	
 	/**
@@ -19,6 +20,7 @@ package
 		// PUBLIC
 		// =============================
 		public var canvas:BitmapData;
+		public var ambient:Vector3D = new Vector3D( 1, 1, 1 );
 		
 		/*=========================================================================================
 		CONSTRUCTOR
@@ -26,6 +28,13 @@ package
 		public function Renderer( canvas:BitmapData )
 		{
 			this.canvas = canvas;
+		}
+		
+		public function addAmbience( value:Number=0.1 ):void
+		{
+			ambient.x += value;
+			ambient.y += value;
+			ambient.z += value;
 		}
 		
 		public function clear():void
@@ -135,7 +144,7 @@ package
 				{
 					// setting this statically to red for now
 					var color:Number = triangle[0].getUVPixel( uv.x, uv.y );
-					canvas.setPixel( sx + i, sy, color );
+					canvas.setPixel( sx + i, sy, applyAmbience( color ) );
 					i += it;
 					
 					xvd.red += rx;
@@ -161,6 +170,22 @@ package
 			}
 		}
 		
+		/** applyAmbience - returns color multiplied by ambient light */
+		protected function applyAmbience( color:uint ):uint
+		{
+			var rgb:Vector3D = toRGB( color );
+			// red
+			rgb.x *= ambient.x;
+			
+			// green
+			rgb.y *= ambient.y;
+			
+			// blue
+			rgb.z *= ambient.z;
+			
+			return (int(rgb.x) << 16) + (int(rgb.y) << 8) + int(rgb.z);
+		}
+		
 		/** sorting method for returning vector ordered by y position low to high */
 		protected function sortByHeight( a:VertexData, b:VertexData ):Number
 		{
@@ -171,6 +196,14 @@ package
 		protected function sortByWidth( a:VertexData, b:VertexData ):Number
 		{
 			return a.x - b.x;
+		}
+		
+		protected function toRGB( color:uint ):Vector3D
+		{
+			var r:Number = color >> 16 & 0xFF;
+			var g:Number = color >> 8 & 0xFF;
+			var b:Number = color & 0xFF;
+			return new Vector3D( r, g, b );
 		}
 		
 		protected function toUint( vertex:VertexData ):uint
