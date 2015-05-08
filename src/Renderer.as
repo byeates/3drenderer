@@ -28,7 +28,12 @@ package
 			this.canvas = canvas;
 		}
 		
-		public function render( triangle:Vector.<VertexData> ):void
+		public function clear():void
+		{
+			canvas.fillRect( canvas.rect, 0 );
+		}
+		
+		public function render( triangle:Vector.<VertexData>, sort:Boolean=true ):void
 		{
 			// not a triangle
 			if ( triangle.length != 3 )
@@ -38,7 +43,11 @@ package
 			
 			var firstPass:Boolean;
 			var shapeWidth:Number = getWidth( triangle );
-			triangle.sort( sortByHeight );
+			
+			if ( sort )
+			{
+				triangle.sort( sortByHeight );
+			}
 			
 			var sx:Number = triangle[0].x;
 			var sy:Number = triangle[0].y;
@@ -102,8 +111,8 @@ package
 				// rounding this for the loop
 				var dist:int = Math.ceil(endX - sx);
 				var w:Number = sx + dist;
-				
-				
+				var it:int = dist > 0 ? 1 : -1;
+				var dir:int = it;
 				
 				// steps across
 				var rx:Number = (bvd.red - cvd.red) / w; 
@@ -115,25 +124,25 @@ package
 				xvd.green = cvd.green;
 				xvd.blue = cvd.blue;
 				
-				
 				// steps across uv
-				var uvx:Number = (uvright.x - uvleft.x) / dist;
-				var uvy:Number = (uvright.y - uvleft.y) / dist;
+				var div:int = Math.abs( dist );
+				var uvx:Number = (uvright.x - uvleft.x) / div;
+				var uvy:Number = (uvright.y - uvleft.y) / div;
 				var uv:Point = new Point( uvleft.x, uvleft.y );
 				
 				var i:int = 0;
-				while( i < dist )
+				while( i != dist )
 				{
 					// setting this statically to red for now
 					var color:Number = triangle[0].getUVPixel( uv.x, uv.y );
 					canvas.setPixel( sx + i, sy, color );
-					++i;
+					i += it;
 					
 					xvd.red += rx;
 					xvd.green += gx;
 					xvd.blue += bx;
 					
-					uv.x += uvx;
+					uv.x += uvx * dir;
 					uv.y += uvy;
 				}
 				
