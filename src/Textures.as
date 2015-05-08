@@ -10,7 +10,7 @@ package
 	public class Textures
 	{
 		// EMBED IMAGES
-		[Embed(source="/Users/byeates/WORKSPACES/TESTS/3drenderer/textures/brick.jpeg")]
+		[Embed(source="/../textures/brick.jpeg")]
 		private static var brickClass:Class;
 		
 		// LIST OF BITMAPS
