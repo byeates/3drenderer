@@ -42,7 +42,12 @@ package
 			canvas.fillRect( canvas.rect, 0 );
 		}
 		
-		public function render( triangle:Vector.<VertexData>, sort:Boolean=true ):void
+		public function renderObject( object:Object3D ):void
+		{
+			
+		}
+		
+		protected function render( triangle:Vector.<VertexData>, sort:Boolean=true ):void
 		{
 			// not a triangle
 			if ( triangle.length != 3 )
