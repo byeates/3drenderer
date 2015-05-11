@@ -84,7 +84,7 @@ package
 			var square:Object3D = new Object3D( mesh, vertices );
 			square.x = stage.stageWidth/2;
 			square.y = stage.stageHeight/2;
-			
+			square.scale( 200, 200 );
 			_renderer.renderObject( square );
 		}
 		
