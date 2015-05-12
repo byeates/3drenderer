@@ -36,7 +36,7 @@ package
 			// top tri
 			triangles.push
 			(
-				new Vector.<Vector3D>
+				new <Vector3D>
 				[
 					new Vector3D( -1, -1, 0 ),
 					new Vector3D(  1, -1, 0 ),
@@ -47,7 +47,7 @@ package
 			// bottom tri
 			triangles.push
 			(
-				new Vector.<Vector3D>
+				new <Vector3D>
 				[
 					new Vector3D(  1, -1, 0 ),
 					new Vector3D(  1,  1, 0 ),

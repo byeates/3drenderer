@@ -44,10 +44,7 @@ package
 		
 		public function renderObject( object:Object3D ):void
 		{
-            for ( var i:int; i < object.mesh.triangles.length; ++i )
-            {
 
-            }
 		}
 		
 		protected function render( triangle:Vector.<VertexData>, sort:Boolean=true ):void
