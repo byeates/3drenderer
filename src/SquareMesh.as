@@ -1,7 +1,5 @@
 package
 {
-	import flash.geom.Vector3D;
-	
 	
 	/**
 	 * ...
@@ -10,76 +8,58 @@ package
 	 * */
 	public class SquareMesh extends MeshData
 	{
-		/*=========================================================================================
-		VARS
-		=========================================================================================*/
-		// =============================
-		// PUBLIC
-		// =============================
-		
-		// =============================
-		// PROTECTED
-		// =============================
-		
-		// =============================
-		// PRIVATE
-		// =============================
+		protected static const VERTICES:int = 4;
 		
 		/*=========================================================================================
 		CONSTRUCTOR
 		=========================================================================================*/
-		public function SquareMesh()
+		public function SquareMesh( uvmap:Vector.<VertexData>=null )
 		{
 			super();
-			this.triangles = new Vector.<Vector.<Vector3D>>();
+			evalMap( uvmap );
 			
 			// top tri
 			triangles.push
 			(
-				new <Vector3D>
+				new <VertexData>
 				[
-					new Vector3D( -1, -1, 0 ),
-					new Vector3D(  1, -1, 0 ),
-					new Vector3D( -1,  1, 0 )
+					new VertexData( -1, -1, 0 ),
+					new VertexData(  1, -1, 0 ),
+					new VertexData( -1,  1, 0 )
 				]
 			);
 			
 			// bottom tri
 			triangles.push
 			(
-				new <Vector3D>
+				new <VertexData>
 				[
-					new Vector3D(  1, -1, 0 ),
-					new Vector3D(  1,  1, 0 ),
-					new Vector3D( -1,  1, 0 )
+					triangles[0][1],
+					triangles[0][2],
+					new VertexData( 1, 1, 0 )
 				]
 			);
+		}
+		
+		override protected function evalMap(map:Vector.<VertexData>):void
+		{
+			if ( !map || map.length != VERTICES ) { return; }
 			
+			triangles[0][0].uvMap = map[0].uvMap;
+			triangles[0][0].u = map[0].u;
+			triangles[0][0].u = map[0].u;
 			
-			/*var a:VertexData = new VertexData( 50, 50, 0 );
-			var b:VertexData = new VertexData( stage.stageWidth-25 - 50, 150, 0 );
-			var c:VertexData = new VertexData( 50, 300, 0 );
+			triangles[0][1].uvMap = map[1].uvMap;
+			triangles[0][1].u = map[1].u;
+			triangles[0][1].u = map[1].u;
 			
-			a.setColorData( 1, 0, 0 );
-			b.setColorData( 1, 0, 0 );
-			c.setColorData( 0, 0, 1 );
+			triangles[0][2].uvMap = map[2].uvMap;
+			triangles[0][2].u = map[2].u;
+			triangles[0][2].u = map[2].u;
 			
-			a.setUV( Textures.getMap( "brick" ) );
-			b.setUV( Textures.getMap( "brick" ), 1, 0 );
-			c.setUV( Textures.getMap( "brick" ), 0, 1 );
-			
-			// bottom tri
-			var ab:VertexData = new VertexData( stage.stageWidth-25 - 50, 150, 0 );
-			var bb:VertexData = new VertexData( 50, 300, 0 );
-			var cb:VertexData = new VertexData( stage.stageWidth-25 - 50, 400, 0 );
-			
-			ab.setColorData( 1, 0, 0 );
-			bb.setColorData( 1, 0, 0 );
-			cb.setColorData( 0, 0, 1 );
-			
-			ab.setUV( Textures.getMap( "brick" ), 1, 0 );
-			bb.setUV( Textures.getMap( "brick" ), 0, 1 );
-			cb.setUV( Textures.getMap( "brick" ), 1, 1 );*/
+			triangles[1][2].uvMap = map[3].uvMap;
+			triangles[1][2].u = map[3].u;
+			triangles[1][2].u = map[3].u;
 		}
 	}
 }

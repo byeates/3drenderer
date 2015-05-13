@@ -80,11 +80,11 @@ package
 			
 			// list of 3d vectors, x, y, z, and color
 			vertices = new <VertexData>[ a, b, c, d ];
-			
-			var square:Object3D = new Object3D( mesh, vertices );
-			square.x = stage.stageWidth/2;
-			square.y = stage.stageHeight/2;
-			square.scale( 200, 200, 200 );
+			mesh.uvmap = vertices;
+						
+			var square:Object3D = new Object3D( mesh );
+			square.scale( 200, 200, 1 );
+			square.translate( stage.stageWidth/2, stage.stageHeight/2, 0 );
 			_renderer.renderObject( square );
 		}
 		

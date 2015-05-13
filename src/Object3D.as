@@ -15,7 +15,6 @@ package
 		// PUBLIC
 		// =============================
 		public var mesh:MeshData;
-		public var vertexData:Vector.<VertexData>;
 		
 		// =============================
 		// PROTECTED
@@ -37,11 +36,9 @@ package
 		/*=========================================================================================
 		CONSTRUCTOR
 		=========================================================================================*/
-		public function Object3D( mesh:MeshData, vertices:Vector.<VertexData> )
+		public function Object3D( mesh:MeshData )
 		{
 			this.mesh = mesh;
-            this.vertexData = vertices;
-
             setWidthAndHeight();
         }
 
@@ -73,17 +70,45 @@ package
             _scaleY = scaleY;
             _scaleZ = scaleZ;
 
+			var checked:Vector.<VertexData> = new Vector.<VertexData>;
 			for ( var i:int; i < mesh.triangles.length; ++i )
 			{
                 for ( var j:int=0; j < mesh.triangles[i].length; ++j )
                 {
+					if ( checked.indexOf( mesh.triangles[i][j] ) != -1 )
+					{
+						continue;
+					}
                     mesh.triangles[i][j].x *= scaleX;
                     mesh.triangles[i][j].y *= scaleY;
                     mesh.triangles[i][j].z *= scaleZ;
+					checked.push( mesh.triangles[i][j] );
                 }
 			}
 
             setWidthAndHeight();
+		}
+		
+		public function translate( x:Number, y:Number, z:Number ):void
+		{
+			_x += x;
+			_y += y;
+			
+			var checked:Vector.<VertexData> = new Vector.<VertexData>;
+			for ( var i:int; i < mesh.triangles.length; ++i )
+			{
+				for ( var j:int=0; j < mesh.triangles[i].length; ++j )
+				{
+					if ( checked.indexOf( mesh.triangles[i][j] ) != -1 )
+					{
+						continue;
+					}
+					mesh.triangles[i][j].x += x;
+					mesh.triangles[i][j].y += y;
+					mesh.triangles[i][j].z += z;
+					checked.push( mesh.triangles[i][j] );
+				}
+			}
 		}
 
         public function get x():Number
