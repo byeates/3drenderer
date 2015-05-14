@@ -44,13 +44,14 @@ package
 		
 		public function renderObject( object:Object3D ):void
 		{
+			object.updateTransformVertices();
 			for ( var i:int; i < object.triangles.length; ++i )
 			{
-				render( object.triangles[i] );
+				render( object, object.triangles[i] );
 			}
 		}
 		
-		protected function render( triangle:Vector.<VertexData>, sort:Boolean=true ):void
+		protected function render( object:Object3D, triangle:Vector.<VertexData>, sort:Boolean=true ):void
 		{
 			// not a triangle
 			if ( triangle.length != 3 )
@@ -59,7 +60,7 @@ package
 			}
 			
 			var firstPass:Boolean;
-			var shapeWidth:Number = getWidth( triangle );
+			var shapeWidth:Number = object.width;
 			
 			if ( sort )
 			{

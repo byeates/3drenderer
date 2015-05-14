@@ -1,6 +1,7 @@
 package
 {
 	import flash.geom.Matrix3D;
+	import flash.geom.Vector3D;
 	
 	/**
 	 * ...
@@ -20,12 +21,18 @@ package
 		// =============================
 		// PROTECTED
 		// =============================
-        protected var _width:Number;
-        protected var _height:Number;
-        protected var _depth:Number;
-        protected var _scaleX:Number;
-        protected var _scaleY:Number;
-        protected var _scaleZ:Number;
+		protected var _x:Number = 0;
+		protected var _y:Number = 0;
+		protected var _z:Number = 0;
+		protected var _rotationX:Number = 0;
+		protected var _rotationY:Number = 0;
+		protected var _rotationZ:Number = 0;
+        protected var _width:Number = 0;
+        protected var _height:Number = 0;
+        protected var _depth:Number = 0;
+        protected var _scaleX:Number = 0;
+        protected var _scaleY:Number = 0;
+        protected var _scaleZ:Number = 0;
 		protected var _transform:Matrix3D;
 		protected var _transformVertices:Vector.<Vector.<VertexData>>;
 
@@ -71,17 +78,17 @@ package
 		{
             _scaleX = scaleX;
             _scaleY = scaleY;
-            _scaleZ = scaleZ;
-			_transform.appendScale( _scaleX, _scaleY, _scaleZ );			
+            _scaleZ = scaleZ;		
 			
             setWidthAndHeight();
-			updateTransformVertices();
 		}
 		
 		/** translate - move the transformation matrix */
 		public function translate( xval:Number, yval:Number, zval:Number ):void
 		{
-			updateTranslation( xval, yval, zval );
+			_x = xval;
+			_y = yval;
+			_z = zval;
 		}
 		
 		/** populateTransformVertices - creates the list of vertex data based on the mesh */
@@ -99,24 +106,18 @@ package
 			}
 		}
 		
-		/** after a transformation, we repopulate the list of vertex data */
-		protected function updateTranslation( xval:Number, yval:Number, zval:Number ):void
-		{
-			for ( var i:int; i < _transformVertices.length; ++i ) 
-			{
-				for ( var j:int = 0; j < _transformVertices[i].length; ++j ) 
-				{
-					var vertex:VertexData = _transformVertices[i][j];
-					vertex.vector.x += xval;
-					vertex.vector.y += yval;
-					vertex.vector.z += zval;
-				}
-			}
-		}
-		
 		/** updateTransformVertices - updates the vertices according to the transform */
-		protected function updateTransformVertices():void
+		public function updateTransformVertices():void
 		{
+			//var pivot:Vector3D = new Vector3D( _x + _width/2, _y + _height/2, _z + _depth/2 );
+			populateTransformVertices();
+			_transform.identity();
+			_transform.appendScale( _scaleX, _scaleY, _scaleZ );
+			_transform.appendTranslation( _x, _y, _z );
+			_transform.prependRotation( _rotationX, Vector3D.X_AXIS );
+			_transform.prependRotation( _rotationY, Vector3D.Y_AXIS );
+			_transform.prependRotation( _rotationZ, Vector3D.Z_AXIS );
+			
 			for ( var i:int; i < _transformVertices.length; ++i ) 
 			{
 				for ( var j:int = 0; j < _transformVertices[i].length; ++j ) 
@@ -132,35 +133,65 @@ package
 		{
 			return _transformVertices;
 		}
+		
+		public function get rotationX():Number
+		{
+			return _rotationX;
+		}
+		
+		public function set rotationX(value:Number):void
+		{
+			_rotationX = value%360;
+		}
+		
+		public function get rotationY():Number
+		{
+			return _rotationY;
+		}
+		
+		public function set rotationY(value:Number):void
+		{
+			_rotationY = value%360;
+		}
+		
+		public function get rotationZ():Number
+		{
+			return _rotationZ;
+		}
+		
+		public function set rotationZ(value:Number):void
+		{
+			_rotationZ = value%360;
+		}
 
         public function get x():Number
         {
-            return _transform.position.x;
+            return _x;
         }
 
         public function set x(value:Number):void
         {
-			_transform.position.x = value;
+			_x = value;
         }
 
         public function get y():Number
         {
-			return _transform.position.y;
+			return _y;
         }
 
         public function set y(value:Number):void
         {
-			_transform.position.y = value;
+			_y = value;
         }
 
         public function get z():Number
         {
-            return _transform.position.z;
+            return _z;
         }
 
         public function set z(value:Number):void
         {
-			_transform.position.z = value;
+			_z = value;
         }
 
         public function get width():Number

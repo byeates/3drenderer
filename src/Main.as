@@ -22,6 +22,7 @@ package
 		// =============================
 		// PUBLIC
 		// =============================
+		public var square:Object3D;
 		
 		// =============================
 		// PROTECTED
@@ -46,6 +47,7 @@ package
 		CONSTRUCTOR
 		=========================================================================================*/
 		private var vertices:Vector.<VertexData>;
+
 		
 		public function Main()
 		{
@@ -78,51 +80,43 @@ package
 			c.setUV( Textures.getMap( "brick" ), 0, 1 );
 			d.setUV( Textures.getMap( "brick" ), 1, 1 );
 						
-			var square:Object3D = new Object3D( mesh );
-			square.scale( 200, 200, 1 );
+			square = new Object3D( mesh );
+			square.scale( 75, 75, 1 );
 			square.translate( stage.stageWidth/2, stage.stageHeight/2, 0 );
 			_renderer.renderObject( square );
 		}
 		
 		protected function onKeyDown(event:KeyboardEvent):void
 		{
-			/*switch( event.keyCode )
+			switch( event.keyCode )
 			{
 				case Keyboard.DOWN:
-					tri1[1].y += MOVE_PIXELS_BY;
-					tri2[0].y += MOVE_PIXELS_BY;
+					square.rotationX += 10;
 					redraw();
 					break;
 				
 				case Keyboard.UP:
-					tri1[1].y -= MOVE_PIXELS_BY;
-					tri2[0].y -= MOVE_PIXELS_BY;
+					square.rotationX -= 10;
 					redraw();
 					break;
 				
 				case Keyboard.LEFT:
-					tri1[0].x -= MOVE_PIXELS_BY;
-					tri2[2].x += MOVE_PIXELS_BY;
+					square.rotationY -= 10;
 					redraw();
 					break;
 				
 				case Keyboard.RIGHT:
-					tri1[0].x += MOVE_PIXELS_BY;
-					tri2[2].x -= MOVE_PIXELS_BY;
-					redraw();
-					break;
-				
-				case Keyboard.W:
-					_renderer.addAmbience();
-					redraw();
-					break;
-				
-				case Keyboard.S:
-					_renderer.addAmbience( -0.1 );
+					square.rotationY += 10;
 					redraw();
 					break;
 					
-			}*/
+			}
+		}
+		
+		private function redraw():void
+		{
+			_renderer.clear();
+			_renderer.renderObject( square );
 		}
 		
 		private function createGrid():void
