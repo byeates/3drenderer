@@ -44,9 +44,9 @@ package
 		
 		public function renderObject( object:Object3D ):void
 		{
-			for ( var i:int; i < object.mesh.triangles.length; ++i )
+			for ( var i:int; i < object.triangles.length; ++i )
 			{
-				render( object.mesh.triangles[i] );
+				render( object.triangles[i] );
 			}
 		}
 		

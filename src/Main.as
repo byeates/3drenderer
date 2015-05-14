@@ -63,24 +63,20 @@ package
 			var mesh:MeshData = new SquareMesh();
 			
 			// top tri
-			var a:VertexData = new VertexData;
-			var b:VertexData = new VertexData;
-			var c:VertexData = new VertexData;
-			var d:VertexData = new VertexData;
+			var a:VertexData = mesh.triangles[0][0];
+			var b:VertexData = mesh.triangles[0][1];
+			var c:VertexData = mesh.triangles[0][2];
+			var d:VertexData = mesh.triangles[1][2];
 			
 			a.setColorData( 1, 0, 0 );
 			b.setColorData( 1, 0, 0 );
 			c.setColorData( 0, 0, 1 );
-			d.setColorData( 0, 0, 1 );
+			c.setColorData( 0, 0, 1 );
 			
 			a.setUV( Textures.getMap( "brick" ) );
 			b.setUV( Textures.getMap( "brick" ), 1, 0 );
 			c.setUV( Textures.getMap( "brick" ), 0, 1 );
 			d.setUV( Textures.getMap( "brick" ), 1, 1 );
-			
-			// list of 3d vectors, x, y, z, and color
-			vertices = new <VertexData>[ a, b, c, d ];
-			mesh.uvmap = vertices;
 						
 			var square:Object3D = new Object3D( mesh );
 			square.scale( 200, 200, 1 );

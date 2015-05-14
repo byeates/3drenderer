@@ -2,6 +2,7 @@ package
 {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.geom.Vector3D;
 	
 	/**
 	 * ...
@@ -10,9 +11,7 @@ package
 	 * */
 	public class VertexData
 	{
-		public var x:Number;
-		public var y:Number;
-		public var z:Number;
+		public var vector:Vector3D;
 		
 		// values 0-1 (representing 0-255)
 		public var red:Number;
@@ -27,9 +26,7 @@ package
 		
 		public function VertexData( x:Number=0, y:Number=0, z:Number=0 )
 		{
-			this.x = x;
-			this.y = y;
-			this.z = z;
+			vector = new Vector3D( x, y, z );
 		}
 		
 		public function setUV( map:Bitmap, u:Number=0, v:Number=0 ):void
@@ -44,6 +41,48 @@ package
 			this.red = red;
 			this.green = green;
 			this.blue = blue;
+		}
+		
+		/** returns a copy of this vertex instance */
+		public function clone():VertexData
+		{
+			var vertex:VertexData = new VertexData( x, y, z );
+			vertex.u = this.u;
+			vertex.v = this.v;
+			vertex.uvMap = uvMap;
+			vertex.clamp = this.clamp;
+			vertex.setColorData( red, green, blue );
+			return vertex;
+		}
+		
+		public function set x( val:Number ):void
+		{
+			vector.x = val;
+		}
+		
+		public function set y( val:Number ):void
+		{
+			vector.y = val;
+		}
+		
+		public function set z( val:Number ):void
+		{
+			vector.z = val;
+		}
+		
+		public function get x():Number
+		{
+			return vector.x;
+		}
+		
+		public function get y():Number
+		{
+			return vector.y;
+		}
+		
+		public function get z():Number
+		{
+			return vector.z;
 		}
 		
 		/** returns pixel data without alpha */

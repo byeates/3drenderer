@@ -1,5 +1,6 @@
 package
 {
+	import flash.geom.Matrix3D;
 	
 	/**
 	 * ...
@@ -19,15 +20,14 @@ package
 		// =============================
 		// PROTECTED
 		// =============================
-        protected var _x:Number;
-        protected var _y:Number;
-        protected var _z:Number;
         protected var _width:Number;
         protected var _height:Number;
         protected var _depth:Number;
         protected var _scaleX:Number;
         protected var _scaleY:Number;
         protected var _scaleZ:Number;
+		protected var _transform:Matrix3D;
+		protected var _transformVertices:Vector.<Vector.<VertexData>>;
 
 		// =============================
 		// PRIVATE
@@ -38,7 +38,9 @@ package
 		=========================================================================================*/
 		public function Object3D( mesh:MeshData )
 		{
+			_transform = new Matrix3D();
 			this.mesh = mesh;
+			populateTransformVertices();
             setWidthAndHeight();
         }
 
@@ -64,81 +66,101 @@ package
             _height = maxY - minY;
         }
 		
+		/** scale - scale the transformation matrix */
 		public function scale( scaleX:Number, scaleY:Number, scaleZ:Number ):void
 		{
             _scaleX = scaleX;
             _scaleY = scaleY;
             _scaleZ = scaleZ;
-
-			var checked:Vector.<VertexData> = new Vector.<VertexData>;
-			for ( var i:int; i < mesh.triangles.length; ++i )
-			{
-                for ( var j:int=0; j < mesh.triangles[i].length; ++j )
-                {
-					if ( checked.indexOf( mesh.triangles[i][j] ) != -1 )
-					{
-						continue;
-					}
-                    mesh.triangles[i][j].x *= scaleX;
-                    mesh.triangles[i][j].y *= scaleY;
-                    mesh.triangles[i][j].z *= scaleZ;
-					checked.push( mesh.triangles[i][j] );
-                }
-			}
-
+			_transform.appendScale( _scaleX, _scaleY, _scaleZ );			
+			
             setWidthAndHeight();
+			updateTransformVertices();
 		}
 		
-		public function translate( x:Number, y:Number, z:Number ):void
+		/** translate - move the transformation matrix */
+		public function translate( xval:Number, yval:Number, zval:Number ):void
 		{
-			_x += x;
-			_y += y;
-			
-			var checked:Vector.<VertexData> = new Vector.<VertexData>;
-			for ( var i:int; i < mesh.triangles.length; ++i )
+			updateTranslation( xval, yval, zval );
+		}
+		
+		/** populateTransformVertices - creates the list of vertex data based on the mesh */
+		protected function populateTransformVertices():void
+		{
+			_transformVertices = new Vector.<Vector.<VertexData>>;
+			for ( var i:int; i < mesh.triangles.length; ++i ) 
 			{
-				for ( var j:int=0; j < mesh.triangles[i].length; ++j )
+				_transformVertices.push( new Vector.<VertexData> );
+				
+				for ( var j:int = 0; j < mesh.triangles[i].length; ++j ) 
 				{
-					if ( checked.indexOf( mesh.triangles[i][j] ) != -1 )
-					{
-						continue;
-					}
-					mesh.triangles[i][j].x += x;
-					mesh.triangles[i][j].y += y;
-					mesh.triangles[i][j].z += z;
-					checked.push( mesh.triangles[i][j] );
+					_transformVertices[i].push( mesh.triangles[i][j].clone() );
 				}
 			}
+		}
+		
+		/** after a transformation, we repopulate the list of vertex data */
+		protected function updateTranslation( xval:Number, yval:Number, zval:Number ):void
+		{
+			for ( var i:int; i < _transformVertices.length; ++i ) 
+			{
+				for ( var j:int = 0; j < _transformVertices[i].length; ++j ) 
+				{
+					var vertex:VertexData = _transformVertices[i][j];
+					vertex.vector.x += xval;
+					vertex.vector.y += yval;
+					vertex.vector.z += zval;
+				}
+			}
+		}
+		
+		/** updateTransformVertices - updates the vertices according to the transform */
+		protected function updateTransformVertices():void
+		{
+			for ( var i:int; i < _transformVertices.length; ++i ) 
+			{
+				for ( var j:int = 0; j < _transformVertices[i].length; ++j ) 
+				{
+					var vertex:VertexData = _transformVertices[i][j];
+					vertex.vector = _transform.transformVector( vertex.vector );
+				}
+			}
+		}
+		
+		/** returns the list of vertex data according to the transforms */
+		public function get triangles():Vector.<Vector.<VertexData>>
+		{
+			return _transformVertices;
 		}
 
         public function get x():Number
         {
-            return _x;
+            return _transform.position.x;
         }
 
         public function set x(value:Number):void
         {
-            _x = value;
+			_transform.position.x = value;
         }
 
         public function get y():Number
         {
-            return _y;
+			return _transform.position.y;
         }
 
         public function set y(value:Number):void
         {
-            _y = value;
+			_transform.position.y = value;
         }
 
         public function get z():Number
         {
-            return _z;
+            return _transform.position.z;
         }
 
         public function set z(value:Number):void
         {
-            _z = value;
+			_transform.position.z = value;
         }
 
         public function get width():Number
