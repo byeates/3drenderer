@@ -153,8 +153,8 @@ package
 				while( i != dist )
 				{
 					// setting this statically to red for now
-					var color:Number = triangle[0].getUVPixel( uv.x, uv.y );
-					canvas.setPixel( sx + i, sy, toUint( xvd ) );
+					//var color:Number = triangle[0].getUVPixel( uv.x, uv.y );
+					canvas.setPixel( sx + i, sy, 0xFF0000 );
 					//trace( "SETTING PIXEL: " + ( sx + i ), sy, "DIST: " + dist );
 					i += it;
 					

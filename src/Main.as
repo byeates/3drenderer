@@ -41,7 +41,7 @@ package
 		private static const GRID_LINE_COLOR:int = 0x333333;
 		private static const GRID_COLUMN_SIZE:int = 25;
 		private static const GRID_ROW_SIZE:int = 25;
-		private static const MOVE_PIXELS_BY:int = 10;
+		private static const MOVE_PIXELS_BY:int = 5;
 		
 		/*=========================================================================================
 		CONSTRUCTOR
@@ -62,7 +62,7 @@ package
 			
 			stage.addEventListener( KeyboardEvent.KEY_DOWN, onKeyDown );
 			
-			var mesh:MeshData = new SquareMesh();
+			var mesh:MeshData = new CubeMesh();
 			
 			// top tri
 			var a:VertexData = mesh.triangles[0][0];
@@ -91,22 +91,22 @@ package
 			switch( event.keyCode )
 			{
 				case Keyboard.DOWN:
-					square.rotationX += 5;
+					square.rotationX += MOVE_PIXELS_BY;
 					redraw();
 					break;
 				
 				case Keyboard.UP:
-					square.rotationX -= 5;
+					square.rotationX -= MOVE_PIXELS_BY;
 					redraw();
 					break;
 				
 				case Keyboard.LEFT:
-					square.rotationY -= 5;
+					square.rotationY -= MOVE_PIXELS_BY;
 					redraw();
 					break;
 				
 				case Keyboard.RIGHT:
-					square.rotationY += 5;
+					square.rotationY += MOVE_PIXELS_BY;
 					redraw();
 					break;
 					
