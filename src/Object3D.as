@@ -124,6 +124,9 @@ package
 				{
 					var vertex:VertexData = _transformVertices[i][j];
 					vertex.vector = _transform.transformVector( vertex.vector );
+					vertex.vector.x = Math.round( vertex.vector.x );
+					vertex.vector.y = Math.round( vertex.vector.y );
+					vertex.vector.z = Math.round( vertex.vector.z );
 				}
 			}
 		}

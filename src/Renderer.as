@@ -47,11 +47,11 @@ package
 			object.updateTransformVertices();
 			for ( var i:int; i < object.triangles.length; ++i )
 			{
-				render( object, object.triangles[i] );
+				render( object.triangles[i] );
 			}
 		}
 		
-		protected function render( object:Object3D, triangle:Vector.<VertexData>, sort:Boolean=true ):void
+		protected function render( triangle:Vector.<VertexData>, sort:Boolean=true ):void
 		{
 			// not a triangle
 			if ( triangle.length != 3 )
@@ -59,13 +59,9 @@ package
 				return;
 			}
 			
-			var firstPass:Boolean;
-			var shapeWidth:Number = object.width;
+			triangle.sort( sortByHeight );
 			
-			if ( sort )
-			{
-				triangle.sort( sortByHeight );
-			}
+			var firstPass:Boolean;
 			
 			var sx:Number = triangle[0].x;
 			var sy:Number = triangle[0].y;
@@ -74,13 +70,16 @@ package
 			var acheight:Number = triangle[2].y - sy;
 			var abheight:Number = triangle[1].y - sy;
 			
-			var acstepX:Number = ( triangle[2].x - sx ) / (triangle[2].y - sy > 0 ? triangle[2].y - sy : 1);
-			var abstepX:Number = (triangle[1].x - sx ) / (triangle[1].y - sy > 0 ? triangle[1].y - sy : 1);			
+			var acstepX:Number = ( triangle[2].x - sx ) / (triangle[2].y - sy != 0 ? triangle[2].y - sy : 1);
+			var abstepX:Number = (triangle[1].x - sx ) / (triangle[1].y - sy != 0 ? triangle[1].y - sy : 1);			
+			
+			var div_ac:Number = acheight == 0 ? 1 : acheight;
+			var div_ab:Number = abheight == 0 ? 1 : abheight;
 			
 			// a to c vertex steps
-			var acstepRed:Number = (triangle[2].red - triangle[0].red) / acheight;
-			var acstepGreen:Number = (triangle[2].green - triangle[0].green) / acheight;
-			var acstepBlue:Number = (triangle[2].blue - triangle[0].blue) / acheight;
+			var acstepRed:Number = (triangle[2].red - triangle[0].red) / div_ac;
+			var acstepGreen:Number = (triangle[2].green - triangle[0].green) / div_ac;
+			var acstepBlue:Number = (triangle[2].blue - triangle[0].blue) / div_ac;
 			
 			var cvd:VertexData = new VertexData();
 			cvd.red = triangle[0].red;
@@ -88,19 +87,19 @@ package
 			cvd.blue = triangle[0].blue;
 			
 			// ac to b vertex steps
-			var abstepRed:Number = (triangle[1].red - triangle[0].red) / abheight;
-			var abstepGreen:Number = (triangle[1].green - triangle[0].green) / abheight;
-			var abstepBlue:Number = (triangle[1].blue - triangle[0].blue) / abheight;
+			var abstepRed:Number = (triangle[1].red - triangle[0].red) / div_ab;
+			var abstepGreen:Number = (triangle[1].green - triangle[0].green) / div_ab;
+			var abstepBlue:Number = (triangle[1].blue - triangle[0].blue) / div_ab;
 			
 			var bvd:VertexData = new VertexData();
 			bvd.red = triangle[0].red;
 			bvd.green = triangle[0].green;
 			bvd.blue = triangle[0].blue;
 			
-			var uvstepleft:Point = new Point( (triangle[2].u - triangle[0].u) / acheight, (triangle[2].v - triangle[0].v) / acheight );
+			var uvstepleft:Point = new Point( (triangle[2].u - triangle[0].u) / div_ac, (triangle[2].v - triangle[0].v) / div_ac );
 			var uvleft:Point = new Point( triangle[0].u, triangle[0].v ); 
 			
-			var uvstepright:Point = new Point( (triangle[1].u - triangle[0].u) / abheight, (triangle[1].v - triangle[0].v) / abheight );
+			var uvstepright:Point = new Point( (triangle[1].u - triangle[0].u) / div_ab, (triangle[1].v - triangle[0].v) / div_ab );
 			var uvright:Point = new Point( triangle[0].u, triangle[0].v );
 			
 			while( sy < triangle[2].y )
@@ -132,6 +131,8 @@ package
 				var it:int = dist > 0 ? 1 : -1;
 				var dir:int = it;
 				
+				//trace( "DIST: " + dist, "AB STEP: " + abstepX );
+				
 				// steps across
 				var rx:Number = (bvd.red - cvd.red) / w; 
 				var gx:Number = (bvd.green - cvd.green) / w; 
@@ -153,7 +154,8 @@ package
 				{
 					// setting this statically to red for now
 					var color:Number = triangle[0].getUVPixel( uv.x, uv.y );
-					canvas.setPixel( sx + i, sy, applyAmbience( color ) );
+					canvas.setPixel( sx + i, sy, toUint( xvd ) );
+					//trace( "SETTING PIXEL: " + ( sx + i ), sy, "DIST: " + dist );
 					i += it;
 					
 					xvd.red += rx;

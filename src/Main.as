@@ -73,7 +73,7 @@ package
 			a.setColorData( 1, 0, 0 );
 			b.setColorData( 1, 0, 0 );
 			c.setColorData( 0, 0, 1 );
-			c.setColorData( 0, 0, 1 );
+			d.setColorData( 0, 0, 1 );
 			
 			a.setUV( Textures.getMap( "brick" ) );
 			b.setUV( Textures.getMap( "brick" ), 1, 0 );
@@ -91,22 +91,22 @@ package
 			switch( event.keyCode )
 			{
 				case Keyboard.DOWN:
-					square.rotationX += 10;
+					square.rotationX += 5;
 					redraw();
 					break;
 				
 				case Keyboard.UP:
-					square.rotationX -= 10;
+					square.rotationX -= 5;
 					redraw();
 					break;
 				
 				case Keyboard.LEFT:
-					square.rotationY -= 10;
+					square.rotationY -= 5;
 					redraw();
 					break;
 				
 				case Keyboard.RIGHT:
-					square.rotationY += 10;
+					square.rotationY += 5;
 					redraw();
 					break;
 					
