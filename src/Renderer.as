@@ -160,13 +160,13 @@ package
 				var i:int = 0;
 				while( i != dist )
 				{
-                    /*if ( !_zbuffer.x[ sx + i ] || !_zbuffer.y[ sy ] || triangle[0].z < _zbuffer.x[ sx + i ] )
-                    {*/
-                       // var color:Number = triangle[0].getUVPixel( uv.x, uv.y );
+                    if ( triangle[0].z >= 0 || triangle[1].z >= 0 || triangle[2].z >= 0 )
+                    {
+                        //var color:Number = triangle[0].getUVPixel( uv.x, uv.y );
                         canvas.setPixel( sx + i, sy, toUint( xvd ) );
                         //_zbuffer.x[ sx + i ] = triangle[0].z;
                         //_zbuffer.y[ sy ] = triangle[0].z;
-                   // }
+                    }
 					//trace( "SETTING PIXEL: " + ( sx + i ), sy, "DIST: " + dist );
 					i += it;
 					
