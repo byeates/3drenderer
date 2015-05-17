@@ -81,6 +81,7 @@ package
             _scaleZ = scaleZ;		
 			
             setWidthAndHeight();
+            updateTransformVertices();
 		}
 		
 		/** translate - move the transformation matrix */
@@ -89,6 +90,7 @@ package
 			_x = xval;
 			_y = yval;
 			_z = zval;
+            updateTransformVertices();
 		}
 		
 		/** populateTransformVertices - creates the list of vertex data based on the mesh */

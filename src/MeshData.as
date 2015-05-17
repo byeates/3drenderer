@@ -1,6 +1,8 @@
 package
 {
-	/**
+import flash.display.Bitmap;
+
+/**
 	 * ...
 	 * @author Bennett Yeates
 	 * 
@@ -31,16 +33,9 @@ package
 			_uvmap = new Vector.<VertexData>();
 		}
 		
-		protected function evalMap( map:Vector.<VertexData> ):void
+		public function setUVData( texture:Bitmap ):void
 		{
 			//should be implemented by sub classes 
-		}
-		
-		/** evaluates and sets the uv map */
-		public function set uvmap( map:Vector.<VertexData> ):void
-		{
-			this._uvmap = map;
-			evalMap( map );
 		}
 	}
 }

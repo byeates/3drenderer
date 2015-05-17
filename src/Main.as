@@ -4,8 +4,6 @@ package
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
 	import flash.events.KeyboardEvent;
-	import flash.geom.Matrix3D;
-	import flash.geom.Vector3D;
 	import flash.ui.Keyboard;
 	
 	/**
@@ -46,9 +44,6 @@ package
 		/*=========================================================================================
 		CONSTRUCTOR
 		=========================================================================================*/
-		private var vertices:Vector.<VertexData>;
-
-		
 		public function Main()
 		{
 			_canvas = new BitmapData( stage.stageWidth, stage.stageHeight, false, 0 );
@@ -63,22 +58,7 @@ package
 			stage.addEventListener( KeyboardEvent.KEY_DOWN, onKeyDown );
 			
 			var mesh:MeshData = new CubeMesh();
-			
-			// top tri
-			var a:VertexData = mesh.triangles[0][0];
-			var b:VertexData = mesh.triangles[0][1];
-			var c:VertexData = mesh.triangles[0][2];
-			var d:VertexData = mesh.triangles[1][2];
-			
-			a.setColorData( 1, 0, 0 );
-			b.setColorData( 1, 0, 0 );
-			c.setColorData( 0, 0, 1 );
-			d.setColorData( 0, 0, 1 );
-			
-			a.setUV( Textures.getMap( "brick" ) );
-			b.setUV( Textures.getMap( "brick" ), 1, 0 );
-			c.setUV( Textures.getMap( "brick" ), 0, 1 );
-			d.setUV( Textures.getMap( "brick" ), 1, 1 );
+			mesh.setUVData( Textures.getMap( "brick" ) );
 						
 			square = new Object3D( mesh );
 			square.scale( 75, 75, 1 );
@@ -88,31 +68,29 @@ package
 		
 		protected function onKeyDown(event:KeyboardEvent):void
 		{
-			switch( event.keyCode )
-			{
-				case Keyboard.DOWN:
-					square.rotationX += MOVE_PIXELS_BY;
-					redraw();
-					break;
-				
-				case Keyboard.UP:
-					square.rotationX -= MOVE_PIXELS_BY;
-					redraw();
-					break;
-				
-				case Keyboard.LEFT:
-					square.rotationY -= MOVE_PIXELS_BY;
-					redraw();
-					break;
-				
-				case Keyboard.RIGHT:
-					square.rotationY += MOVE_PIXELS_BY;
-					redraw();
-					break;
-					
-			}
-		}
-		
+            switch( event.keyCode )
+            {
+                case Keyboard.DOWN:
+                    square.rotationX += MOVE_PIXELS_BY;
+                    break;
+
+                case Keyboard.UP:
+                    square.rotationX -= MOVE_PIXELS_BY;
+                    break;
+
+                case Keyboard.LEFT:
+                    square.rotationY -= MOVE_PIXELS_BY;
+                    break;
+
+                case Keyboard.RIGHT:
+                    square.rotationY += MOVE_PIXELS_BY;
+                    break;
+
+            }
+            square.updateTransformVertices();
+            redraw();
+        }
+
 		private function redraw():void
 		{
 			_renderer.clear();

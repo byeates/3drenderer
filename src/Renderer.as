@@ -21,6 +21,8 @@ package
 		// =============================
 		public var canvas:BitmapData;
 		public var ambient:Vector3D = new Vector3D( 1, 1, 1 );
+
+		protected var _zbuffer:Object = {};
 		
 		/*=========================================================================================
 		CONSTRUCTOR
@@ -28,7 +30,13 @@ package
 		public function Renderer( canvas:BitmapData )
 		{
 			this.canvas = canvas;
+            clearZBuffer();
 		}
+
+		public function clearZBuffer():void
+        {
+            _zbuffer = { x: {}, y:{} };
+        }
 		
 		public function addAmbience( value:Number=0.1 ):void
 		{
@@ -39,13 +47,13 @@ package
 		
 		public function clear():void
 		{
-			canvas.fillRect( canvas.rect, 0 );
-		}
-		
-		public function renderObject( object:Object3D ):void
-		{
-			object.updateTransformVertices();
-			for ( var i:int; i < object.triangles.length; ++i )
+            clearZBuffer();
+            canvas.fillRect( canvas.rect, 0 );
+        }
+
+        public function renderObject( object:Object3D ):void
+        {
+			for ( var i:int=0; i < object.triangles.length; ++i )
 			{
 				render( object.triangles[i] );
 			}
@@ -71,7 +79,7 @@ package
 			var abheight:Number = triangle[1].y - sy;
 			
 			var acstepX:Number = ( triangle[2].x - sx ) / (triangle[2].y - sy != 0 ? triangle[2].y - sy : 1);
-			var abstepX:Number = (triangle[1].x - sx ) / (triangle[1].y - sy != 0 ? triangle[1].y - sy : 1);			
+			var abstepX:Number = (triangle[1].x - sx ) / (triangle[1].y - sy != 0 ? triangle[1].y - sy : 1);
 			
 			var div_ac:Number = acheight == 0 ? 1 : acheight;
 			var div_ab:Number = abheight == 0 ? 1 : abheight;
@@ -152,9 +160,13 @@ package
 				var i:int = 0;
 				while( i != dist )
 				{
-					// setting this statically to red for now
-					//var color:Number = triangle[0].getUVPixel( uv.x, uv.y );
-					canvas.setPixel( sx + i, sy, 0xFF0000 );
+                    /*if ( !_zbuffer.x[ sx + i ] || !_zbuffer.y[ sy ] || triangle[0].z < _zbuffer.x[ sx + i ] )
+                    {*/
+                       // var color:Number = triangle[0].getUVPixel( uv.x, uv.y );
+                        canvas.setPixel( sx + i, sy, 0xFF0000 );
+                        //_zbuffer.x[ sx + i ] = triangle[0].z;
+                        //_zbuffer.y[ sy ] = triangle[0].z;
+                   // }
 					//trace( "SETTING PIXEL: " + ( sx + i ), sy, "DIST: " + dist );
 					i += it;
 					
@@ -168,7 +180,7 @@ package
 				
 				if ( sy >= triangle[1].y && !firstPass )
 				{
-					var h:Number = triangle[2].y - triangle[1].y > 0 ? triangle[2].y - triangle[1].y : 1;
+					var h:Number = triangle[2].y - triangle[1].y != 0 ? triangle[2].y - triangle[1].y : 1;
 					abstepX = ( triangle[2].x - triangle[1].x ) / h;
 					firstPass = true;
 					abstepRed = ( triangle[2].red - triangle[1].red ) / h;
