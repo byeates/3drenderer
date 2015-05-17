@@ -3,7 +3,8 @@ package
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
-	import flash.events.KeyboardEvent;
+import flash.events.Event;
+import flash.events.KeyboardEvent;
 	import flash.ui.Keyboard;
 	
 	/**
@@ -31,7 +32,9 @@ package
 		// =============================
 		// PRIVATE
 		// =============================
-		
+        // list of key presses
+        private static var _keys:Object;
+
 		// =============================
 		// CONST
 		// =============================
@@ -40,7 +43,7 @@ package
 		private static const GRID_COLUMN_SIZE:int = 25;
 		private static const GRID_ROW_SIZE:int = 25;
 		private static const MOVE_PIXELS_BY:int = 5;
-		
+
 		/*=========================================================================================
 		CONSTRUCTOR
 		=========================================================================================*/
@@ -50,45 +53,72 @@ package
 			
 			// comment this out if grid lines are not wanted
 			createGrid();
-			
+            _keys = {};
+
 			addChild( new Bitmap( _canvas ) );
-			
+
 			_renderer = new Renderer( _canvas );
-			
-			stage.addEventListener( KeyboardEvent.KEY_DOWN, onKeyDown );
-			
+
+			addEventListener( Event.ENTER_FRAME, update );
+            stage.addEventListener( KeyboardEvent.KEY_DOWN, onKeyDown );
+            stage.addEventListener( KeyboardEvent.KEY_UP, onKeyUp );
+
 			var mesh:MeshData = new CubeMesh();
 			mesh.setUVData( Textures.getMap( "brick" ) );
-						
+
 			square = new Object3D( mesh );
-			square.scale( 75, 75, 1 );
+			square.scale( 50, 50, 1 );
 			square.translate( stage.stageWidth/2, stage.stageHeight/2, 0 );
 			_renderer.renderObject( square );
 		}
-		
-		protected function onKeyDown(event:KeyboardEvent):void
+		protected function onKeyDown( e:KeyboardEvent ):void
+        {
+            _keys[ e.keyCode ] = true;
+        }
+        protected function onKeyUp( e:KeyboardEvent ):void
+        {
+            _keys[ e.keyCode ] = false;
+        }
+
+		protected function update(event:Event):void
 		{
-            switch( event.keyCode )
+            var doRedraw:Boolean;
+            for ( var key:String in _keys )
             {
-                case Keyboard.DOWN:
-                    square.rotationX += MOVE_PIXELS_BY;
-                    break;
+                if ( _keys[ key ] === true )
+                {
+                    switch( int(key) )
+                    {
+                        case Keyboard.DOWN:
+                            square.rotationX += MOVE_PIXELS_BY;
+                            doRedraw = true;
+                            break;
 
-                case Keyboard.UP:
-                    square.rotationX -= MOVE_PIXELS_BY;
-                    break;
+                        case Keyboard.UP:
+                            square.rotationX -= MOVE_PIXELS_BY;
+                            doRedraw = true;
+                            break;
 
-                case Keyboard.LEFT:
-                    square.rotationY -= MOVE_PIXELS_BY;
-                    break;
+                        case Keyboard.LEFT:
+                            square.rotationY -= MOVE_PIXELS_BY;
+                            doRedraw = true;
+                            break;
 
-                case Keyboard.RIGHT:
-                    square.rotationY += MOVE_PIXELS_BY;
-                    break;
+                        case Keyboard.RIGHT:
+                            square.rotationY += MOVE_PIXELS_BY;
+                            doRedraw = true;
+                            break;
 
+                    }
+                }
             }
-            square.updateTransformVertices();
-            redraw();
+
+            if ( doRedraw )
+            {
+                trace( "drawing" );
+                square.updateTransformVertices();
+                redraw();
+            }
         }
 
 		private function redraw():void
