@@ -46,6 +46,7 @@ package
 		public function Object3D( mesh:MeshData )
 		{
 			_transform = new Matrix3D();
+            _transformVertices = new Vector.<Vector.<VertexData>>;
 			this.mesh = mesh;
 			populateTransformVertices();
             setWidthAndHeight();
@@ -96,7 +97,7 @@ package
 		/** populateTransformVertices - creates the list of vertex data based on the mesh */
 		protected function populateTransformVertices():void
 		{
-			_transformVertices = new Vector.<Vector.<VertexData>>;
+			_transformVertices.length = 0;
 			for ( var i:int; i < mesh.triangles.length; ++i ) 
 			{
 				_transformVertices.push( new Vector.<VertexData> );
