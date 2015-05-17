@@ -163,7 +163,7 @@ package
                     /*if ( !_zbuffer.x[ sx + i ] || !_zbuffer.y[ sy ] || triangle[0].z < _zbuffer.x[ sx + i ] )
                     {*/
                        // var color:Number = triangle[0].getUVPixel( uv.x, uv.y );
-                        canvas.setPixel( sx + i, sy, 0xFF0000 );
+                        canvas.setPixel( sx + i, sy, toUint( xvd ) );
                         //_zbuffer.x[ sx + i ] = triangle[0].z;
                         //_zbuffer.y[ sy ] = triangle[0].z;
                    // }
