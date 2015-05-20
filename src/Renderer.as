@@ -21,8 +21,11 @@ package
 		// =============================
 		public var canvas:BitmapData;
 		public var ambient:Vector3D = new Vector3D( 1, 1, 1 );
-
-		protected var _zbuffer:Object = {};
+		
+		// =============================
+		// CONST
+		// =============================
+		protected static const CAMERA_VIEW:Vector3D = new Vector3D( 0, 0, 10 );
 		
 		/*=========================================================================================
 		CONSTRUCTOR
@@ -30,12 +33,30 @@ package
 		public function Renderer( canvas:BitmapData )
 		{
 			this.canvas = canvas;
-            clearZBuffer();
 		}
 
-		public function clearZBuffer():void
+		public function cull( object:Object3D ):Vector.<Vector.<VertexData>>
         {
-            _zbuffer = { x: {}, y:{} };
+			var triangles:Vector.<Vector.<VertexData>> = new Vector.<Vector.<VertexData>>;
+			for ( var i:int; i < object.triangles.length-1; i += 2 )
+			{
+				var triangle:Vector.<VertexData> = object.triangles[i];
+				var v0:Vector3D = triangle[0].clone().vector;
+				var v1:Vector3D = triangle[1].clone().vector;
+				var v2:Vector3D = triangle[2].clone().vector;
+				
+				var n:Vector3D = v1.subtract( v0 ).crossProduct( v2.subtract( v0 ) );
+				n.normalize();
+				var d:Number = n.dotProduct( v0.subtract( CAMERA_VIEW ));
+				
+				if ( d <= 0 )
+				{
+					triangles.push( triangle );
+					triangles.push( object.triangles[i+1] );
+					trace( "added triangles: " + i, i+1 );
+				}
+			}
+			return triangles;
         }
 		
 		public function addAmbience( value:Number=0.1 ):void
@@ -47,16 +68,18 @@ package
 		
 		public function clear():void
 		{
-            clearZBuffer();
             canvas.fillRect( canvas.rect, 0 );
         }
 
         public function renderObject( object:Object3D ):void
         {
-			for ( var i:int=0; i < object.triangles.length; ++i )
+			trace( "culling triangle" );
+			var triangles:Vector.<Vector.<VertexData>> = cull( object );
+			for ( var i:int=0; i < triangles.length; ++i )
 			{
-				render( object.triangles[i] );
+				render( triangles[i] );
 			}
+			trace( "\n" );
 		}
 		
 		protected function render( triangle:Vector.<VertexData>, sort:Boolean=true ):void
@@ -215,10 +238,16 @@ package
 			return a.y - b.y;
 		}
 		
-		/** sorting method for returning vector ordered by y position low to high */
+		/** sorting method for returning vector ordered by x position low to high */
 		protected function sortByWidth( a:VertexData, b:VertexData ):Number
 		{
 			return a.x - b.x;
+		}
+		
+		/** sorting method for returning vector ordered by z position low to high */
+		protected function sortByZ( a:VertexData, b:VertexData ):Number
+		{
+			return a.z - b.z;
 		}
 		
 		protected function toRGB( color:uint ):Vector3D

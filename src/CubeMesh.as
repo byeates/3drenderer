@@ -89,7 +89,7 @@ public class CubeMesh extends MeshData
             triangles.push(
                 new <VertexData>
                 [
-                    new VertexData( 1,  1,  -1 ),
+                    new VertexData( 1, 1, -1 ),
                     triangles[6][2],
                     triangles[6][1]
                 ]);
@@ -100,16 +100,16 @@ public class CubeMesh extends MeshData
             triangles.push(
                 new <VertexData>
                 [
-                    new VertexData(  1, -1, 1 ),
-                    new VertexData( -1, -1, 1 ),
-                    new VertexData(  1, -1, -1 )
+                    new VertexData( -1, -1, -1 ),
+                    new VertexData(  1, -1, -1 ),
+                    new VertexData( -1, -1,  1 )
                 ]);
 
             // bottom tri
             triangles.push(
                 new <VertexData>
                 [
-                    new VertexData( -1, -1, -1 ),
+                    new VertexData( 1, -1, 1 ),
                     triangles[8][2],
                     triangles[8][1]
                 ]);
@@ -120,16 +120,16 @@ public class CubeMesh extends MeshData
             triangles.push(
                 new <VertexData>
                 [
-                    new VertexData(  1, 1,  1 ),
                     new VertexData( -1, 1,  1 ),
-                    new VertexData(  1, 1, -1 )
+                    new VertexData(  1, 1,  1 ),
+                    new VertexData( -1, 1, -1 )
                 ]);
 
             // bottom tri
             triangles.push(
                 new <VertexData>
                 [
-                    new VertexData( -1, 1, -1 ),
+                    new VertexData( 1, 1, -1 ),
                     triangles[10][2],
                     triangles[10][1]
                 ]);

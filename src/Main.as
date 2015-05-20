@@ -115,7 +115,6 @@ import flash.events.KeyboardEvent;
 
             if ( doRedraw )
             {
-                trace( "drawing" );
                 square.updateTransformVertices();
                 redraw();
             }
