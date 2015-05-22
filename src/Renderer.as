@@ -46,10 +46,8 @@ package
 				var v2:Vector3D = triangle[2].clone().vector;
 				
 				var n:Vector3D = v1.subtract( v0 ).crossProduct( v2.subtract( v0 ) );
-				n.normalize();
-				var d:Number = n.dotProduct( v0.subtract( CAMERA_VIEW ));
 				
-				if ( d <= 0 )
+				if ( n.z > 0 )
 				{
 					triangles.push( triangle );
 					triangles.push( object.triangles[i+1] );
@@ -82,7 +80,7 @@ package
 			trace( "\n" );
 		}
 		
-		protected function render( triangle:Vector.<VertexData>, sort:Boolean=true ):void
+		protected function render( triangle:Vector.<VertexData> ):void
 		{
 			// not a triangle
 			if ( triangle.length != 3 )

@@ -38,7 +38,7 @@ public class CubeMesh extends MeshData
             // =============================
             // LEFT FACE
             // =============================
-            triangles.push(
+           triangles.push(
                 new <VertexData>
                 [
                     new VertexData( -1, -1, -1 ),
@@ -57,7 +57,7 @@ public class CubeMesh extends MeshData
             // =============================
             // BACK FACE
             // =============================
-            triangles.push(
+			  triangles.push(
                 new <VertexData>
                 [
                     new VertexData(  1, -1, -1 ),
@@ -137,7 +137,7 @@ public class CubeMesh extends MeshData
 
 		override public function setUVData( texture:Bitmap ):void
         {
-            for (var i:int =0; i < triangles.length-1; i += 2)
+            for (var i:int = 0; i < triangles.length-1; i += 2)
             {
                 // setting a random color for now
                 triangles[i][0].setColorData( Math.random(), Math.random(), Math.random() );

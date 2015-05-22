@@ -67,7 +67,7 @@ import flash.events.KeyboardEvent;
 			mesh.setUVData( Textures.getMap( "brick" ) );
 
 			square = new Object3D( mesh );
-			square.scale( 50, 50, 1 );
+			square.scale( 100, 100, 1 );
 			square.translate( stage.stageWidth/2, stage.stageHeight/2, 0 );
 			_renderer.renderObject( square );
 		}
