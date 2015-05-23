@@ -51,7 +51,6 @@ package
 				{
 					triangles.push( triangle );
 					triangles.push( object.triangles[i+1] );
-					trace( "added triangles: " + i, i+1 );
 				}
 			}
 			return triangles;
@@ -71,13 +70,11 @@ package
 
         public function renderObject( object:Object3D ):void
         {
-			trace( "culling triangle" );
 			var triangles:Vector.<Vector.<VertexData>> = cull( object );
 			for ( var i:int=0; i < triangles.length; ++i )
 			{
 				render( triangles[i] );
 			}
-			trace( "\n" );
 		}
 		
 		protected function render( triangle:Vector.<VertexData> ):void
@@ -87,7 +84,7 @@ package
 			{
 				return;
 			}
-			
+
 			triangle.sort( sortByHeight );
 			
 			var firstPass:Boolean;
@@ -104,6 +101,8 @@ package
 			
 			var div_ac:Number = acheight == 0 ? 1 : acheight;
 			var div_ab:Number = abheight == 0 ? 1 : abheight;
+
+            var stepY:int = triangle[2].y < sy ? -1 : 1;
 			
 			// a to c vertex steps
 			var acstepRed:Number = (triangle[2].red - triangle[0].red) / div_ac;
@@ -131,17 +130,17 @@ package
 			var uvstepright:Point = new Point( (triangle[1].u - triangle[0].u) / div_ab, (triangle[1].v - triangle[0].v) / div_ab );
 			var uvright:Point = new Point( triangle[0].u, triangle[0].v );
 			
-			while( sy < triangle[2].y )
+			while( sy != triangle[2].y )
 			{
 				sx += acstepX;
-				sy += 1;
+				sy += stepY;
 				
 				cvd.red += acstepRed;
 				cvd.green += acstepGreen;
 				cvd.blue += acstepBlue;
 				
 				endX += abstepX;
-				endY += 1;
+				endY += stepY;
 				
 				bvd.red += abstepRed;
 				bvd.green += abstepGreen;
@@ -155,16 +154,14 @@ package
 				uvright.y += uvstepright.y;
 				
 				// rounding this for the loop
-				var dist:int = Math.ceil(endX - sx);
-				var w:Number = sx + dist;
+				var dist:int = endX < sx ? Math.floor( endX - sx ) : Math.ceil( endX - sx );
 				var it:int = dist > 0 ? 1 : -1;
 				var dir:int = it;
-				
-				//trace( "DIST: " + dist, "AB STEP: " + abstepX );
+				var w:int = dist * dir;
 				
 				// steps across
-				var rx:Number = (bvd.red - cvd.red) / w; 
-				var gx:Number = (bvd.green - cvd.green) / w; 
+				var rx:Number = (bvd.red - cvd.red) / w;
+				var gx:Number = (bvd.green - cvd.green) / w;
 				var bx:Number = (bvd.blue - cvd.blue) / w;
 				
 				var xvd:VertexData = new VertexData();
@@ -173,46 +170,42 @@ package
 				xvd.blue = cvd.blue;
 				
 				// steps across uv
-				var div:int = Math.abs( dist );
-				var uvx:Number = (uvright.x - uvleft.x) / div;
-				var uvy:Number = (uvright.y - uvleft.y) / div;
+				var uvx:Number = (uvright.x - uvleft.x) / w;
+				var uvy:Number = (uvright.y - uvleft.y) / w;
 				var uv:Point = new Point( uvleft.x, uvleft.y );
 				
 				var i:int = 0;
 				while( i != dist )
 				{
-                    if ( triangle[0].z >= 0 || triangle[1].z >= 0 || triangle[2].z >= 0 )
-                    {
-                        //var color:Number = triangle[0].getUVPixel( uv.x, uv.y );
-                        canvas.setPixel( sx + i, sy, toUint( xvd ) );
-                        //_zbuffer.x[ sx + i ] = triangle[0].z;
-                        //_zbuffer.y[ sy ] = triangle[0].z;
-                    }
-					//trace( "SETTING PIXEL: " + ( sx + i ), sy, "DIST: " + dist );
+                    var color:Number = triangle[0].getUVPixel( uv.x, uv.y );
+                    canvas.setPixel( sx + i, sy, applyAmbience( color ));
 					i += it;
 					
 					xvd.red += rx;
 					xvd.green += gx;
 					xvd.blue += bx;
 					
-					uv.x += uvx * dir;
+					uv.x += uvx;
 					uv.y += uvy;
 				}
-				
-				if ( sy >= triangle[1].y && !firstPass )
+
+				if ( !firstPass && ((stepY < 0 && sy <= triangle[1].y) || (stepY > 0 && sy >= triangle[1].y)))
 				{
 					var h:Number = triangle[2].y - triangle[1].y != 0 ? triangle[2].y - triangle[1].y : 1;
+                    h *= stepY;
 					abstepX = ( triangle[2].x - triangle[1].x ) / h;
 					firstPass = true;
-					abstepRed = ( triangle[2].red - triangle[1].red ) / h;
-					abstepGreen = ( triangle[2].green - triangle[1].green ) / h;
-					abstepBlue = ( triangle[2].blue - triangle[1].blue ) / h;
-					
-					uvstepright = new Point( (triangle[2].u - triangle[1].u) / h, (triangle[2].v - triangle[1].v) / h );
+
+                    // this is altered, it's really b-c step
+					abstepRed = ( triangle[2].red - bvd.red ) / h;
+					abstepGreen = ( triangle[2].green - bvd.green ) / h;
+					abstepBlue = ( triangle[2].blue - bvd.blue ) / h;
+
+					uvstepright = new Point( (triangle[2].u - triangle[1].u ) / h, (triangle[2].v - triangle[1].v) / h );
 					uvright = new Point( triangle[1].u, triangle[1].v );
 				}
 			}
-		}
+ 		}
 		
 		/** applyAmbience - returns color multiplied by ambient light */
 		protected function applyAmbience( color:uint ):uint
