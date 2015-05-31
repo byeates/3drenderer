@@ -20,12 +20,13 @@ package
 		// PUBLIC
 		// =============================
 		public var canvas:BitmapData;
-		public var ambient:Vector3D = new Vector3D( 1, 1, 1 );
+		public var ambience:Number = 0.1;
 		
 		// =============================
 		// CONST
 		// =============================
-		protected static const CAMERA_VIEW:Vector3D = new Vector3D( 0, 0, 10 );
+		protected static const CAMERA_VIEW:Vector3D = new Vector3D( 0, 0, 1 );
+        protected static const GLOBAL_LIGHT_DIR:Vector3D = new Vector3D( 350, 250, 10 );
 		
 		/*=========================================================================================
 		CONSTRUCTOR
@@ -58,9 +59,7 @@ package
 		
 		public function addAmbience( value:Number=0.1 ):void
 		{
-			ambient.x += value;
-			ambient.y += value;
-			ambient.z += value;
+			ambience += value;
 		}
 		
 		public function clear():void
@@ -101,6 +100,42 @@ package
 			
 			var div_ac:Number = acheight == 0 ? 1 : acheight;
 			var div_ab:Number = abheight == 0 ? 1 : abheight;
+
+			// lighting
+			var a:Vector3D = triangle[0].vector.clone();
+			var b:Vector3D = triangle[1].vector.clone();
+			var c:Vector3D = triangle[2].vector.clone();
+
+			var lightVectorA:Vector3D = GLOBAL_LIGHT_DIR.subtract( a );
+			var lightVectorB:Vector3D = GLOBAL_LIGHT_DIR.subtract( b );
+			var lightVectorC:Vector3D = GLOBAL_LIGHT_DIR.subtract( c );
+
+			a = b.subtract( a ).crossProduct( c.subtract( a ) );
+			b = a.subtract( b ).crossProduct( c.subtract( b ) );
+			c = a.subtract( c ).crossProduct( b.subtract( c ) );
+
+			a.normalize();
+			b.normalize();
+			c.normalize();
+			lightVectorA.normalize();
+			lightVectorB.normalize();
+			lightVectorC.normalize();
+
+			var aDot:Number = Math.max( lightVectorA.dotProduct( a ), ambience );
+			var bDot:Number = Math.max( lightVectorB.dotProduct( b ), ambience );
+			var cDot:Number = Math.max( lightVectorC.dotProduct( c ), ambience );
+
+			var diffuseA:Number = aDot * (1 / (1 + 0.25 * lightVectorA.length * lightVectorA.length));
+			var diffuseB:Number = bDot * (1 / (1 + 0.25 * lightVectorB.length * lightVectorB.length));
+			var diffuseC:Number = cDot * (1 / (1 + 0.25 * lightVectorC.length * lightVectorC.length));
+
+			var gl_ab:Number = diffuseA;
+			var gl_ac:Number = diffuseA;
+
+			var gl_stepab:Number = ( diffuseB - diffuseA ) / div_ab;
+			var gl_stepac:Number = ( diffuseC - diffuseA ) / div_ac;
+
+			trace( gl_ab, gl_ac, gl_stepab, gl_stepac );
 
             var stepY:int = triangle[2].y < sy ? -1 : 1;
 			
@@ -152,12 +187,20 @@ package
 				
 				uvright.x += uvstepright.x;
 				uvright.y += uvstepright.y;
+
+				// global light step
+				gl_ab += gl_stepab;
+				gl_ac += gl_stepac;
 				
 				// rounding this for the loop
 				var dist:int = endX < sx ? Math.floor( endX - sx ) : Math.ceil( endX - sx );
 				var it:int = dist > 0 ? 1 : -1;
 				var dir:int = it;
 				var w:int = dist * dir;
+
+				// global light step across
+				var gl_current:Number = gl_ac;
+				var gl_step:Number = (gl_ab - gl_ac) / w;
 				
 				// steps across
 				var rx:Number = (bvd.red - cvd.red) / w;
@@ -178,7 +221,7 @@ package
 				while( i != dist )
 				{
                     var color:Number = triangle[0].getUVPixel( uv.x, uv.y );
-                    canvas.setPixel( sx + i, sy, applyAmbience( color ));
+                    canvas.setPixel( sx + i, sy, applyLight( color, gl_current ));
 					i += it;
 					
 					xvd.red += rx;
@@ -187,6 +230,8 @@ package
 					
 					uv.x += uvx;
 					uv.y += uvy;
+
+					gl_current += gl_step;
 				}
 
 				if ( !firstPass && ((stepY < 0 && sy <= triangle[1].y) || (stepY > 0 && sy >= triangle[1].y)))
@@ -203,22 +248,41 @@ package
 
 					uvstepright = new Point( (triangle[2].u - triangle[1].u ) / h, (triangle[2].v - triangle[1].v) / h );
 					uvright = new Point( triangle[1].u, triangle[1].v );
+
+					gl_ab = diffuseB;
+					gl_stepab = (diffuseC - diffuseB) / h;
 				}
 			}
  		}
+
+        /** applyLight - returns color multiplied by ambient light */
+		protected function applyLight( color:uint, strength:Number ):uint
+		{
+			var rgb:Vector3D = toRGB( color );
+			// red
+			rgb.x *= strength;
+
+			// green
+			rgb.y *= strength;
+
+			// blue
+			rgb.z *= strength;
+
+			return (int(rgb.x) << 16) + (int(rgb.y) << 8) + int(rgb.z);
+		}
 		
 		/** applyAmbience - returns color multiplied by ambient light */
 		protected function applyAmbience( color:uint ):uint
 		{
 			var rgb:Vector3D = toRGB( color );
 			// red
-			rgb.x *= ambient.x;
+			rgb.x *= ambience;
 			
 			// green
-			rgb.y *= ambient.y;
+			rgb.y *= ambience;
 			
 			// blue
-			rgb.z *= ambient.z;
+			rgb.z *= ambience;
 			
 			return (int(rgb.x) << 16) + (int(rgb.y) << 8) + int(rgb.z);
 		}

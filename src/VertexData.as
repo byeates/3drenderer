@@ -12,6 +12,7 @@ package
 	public class VertexData
 	{
 		public var vector:Vector3D;
+        public var normal:Vector3D;
 		
 		// values 0-1 (representing 0-255)
 		public var red:Number;
@@ -54,6 +55,14 @@ package
 			vertex.setColorData( red, green, blue );
 			return vertex;
 		}
+
+        /** returns a normalized vector3d of this vertex */
+        public function normalize():Vector3D
+        {
+            var v:Vector3D = new Vector3D( x, y, z );
+            v.normalize();
+            return v;
+        }
 		
 		public function set x( val:Number ):void
 		{
