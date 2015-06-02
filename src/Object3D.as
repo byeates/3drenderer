@@ -108,11 +108,28 @@ package
 				}
 			}
 		}
+
+		/** returns a vertice in objects local coordinate space
+		 * @param vertex - an existing transformed vertex
+		 * */
+		public function getLocalVector( vertex:VertexData ):Vector3D
+		{
+			for ( var i:int; i < mesh.triangles.length; ++i )
+			{
+				for ( var j:int = 0; j < mesh.triangles[i].length; ++j )
+				{
+					if ( _transformVertices[i][j] == vertex )
+					{
+						return mesh.triangles[i][j].vector.clone();
+					}
+				}
+			}
+			return null;
+		}
 		
 		/** updateTransformVertices - updates the vertices according to the transform */
 		public function updateTransformVertices():void
 		{
-			//var pivot:Vector3D = new Vector3D( _x + _width/2, _y + _height/2, _z + _depth/2 );
 			populateTransformVertices();
 			_transform.identity();
 			_transform.appendScale( _scaleX, _scaleY, _scaleZ );

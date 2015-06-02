@@ -109,6 +109,25 @@ import flash.events.KeyboardEvent;
                             doRedraw = true;
                             break;
 
+						case Keyboard.W:
+							_renderer.addAmbience();
+							doRedraw = true;
+							break;
+
+						case Keyboard.S:
+							_renderer.addAmbience(-0.1);
+							doRedraw = true;
+							break;
+
+						case Keyboard.A:
+							_renderer.rotateLight();
+							doRedraw = true;
+							break;
+
+						case Keyboard.D:
+							_renderer.rotateLight( 1 );
+							doRedraw = true;
+							break;
                     }
                 }
             }

@@ -21,12 +21,14 @@ package
 		// =============================
 		public var canvas:BitmapData;
 		public var ambience:Number = 0.1;
+		public var lightRotation:Number = 0;
 		
 		// =============================
 		// CONST
 		// =============================
 		protected static const CAMERA_VIEW:Vector3D = new Vector3D( 0, 0, 1 );
-        protected static const GLOBAL_LIGHT_DIR:Vector3D = new Vector3D( 350, 250, 10 );
+        protected static var GLOBAL_LIGHT_DIR:Vector3D = new Vector3D( 0, 0, 1 );
+		protected static const ROTATE_AMOUNT:int = 5;
 		
 		/*=========================================================================================
 		CONSTRUCTOR
@@ -61,6 +63,22 @@ package
 		{
 			ambience += value;
 		}
+
+		public function rotateLight( dir:int=-1 ):void
+		{
+			if ( dir < 0 )
+			{
+				lightRotation -= ROTATE_AMOUNT;
+				GLOBAL_LIGHT_DIR.x = Math.cos( lightRotation * Math.PI / 180 );
+				GLOBAL_LIGHT_DIR.x = Math.sin( lightRotation * Math.PI / 180 );
+			}
+			else
+			{
+				lightRotation += ROTATE_AMOUNT;
+				GLOBAL_LIGHT_DIR.y = Math.sin( lightRotation * Math.PI / 180 );
+				GLOBAL_LIGHT_DIR.x = Math.cos( lightRotation * Math.PI / 180 );
+			}
+		}
 		
 		public function clear():void
 		{
@@ -72,11 +90,11 @@ package
 			var triangles:Vector.<Vector.<VertexData>> = cull( object );
 			for ( var i:int=0; i < triangles.length; ++i )
 			{
-				render( triangles[i] );
+				render( triangles[i], object );
 			}
 		}
 		
-		protected function render( triangle:Vector.<VertexData> ):void
+		protected function render( triangle:Vector.<VertexData>, object3d:Object3D ):void
 		{
 			// not a triangle
 			if ( triangle.length != 3 )
@@ -102,40 +120,23 @@ package
 			var div_ab:Number = abheight == 0 ? 1 : abheight;
 
 			// lighting
-			var a:Vector3D = triangle[0].vector.clone();
-			var b:Vector3D = triangle[1].vector.clone();
-			var c:Vector3D = triangle[2].vector.clone();
-
-			var lightVectorA:Vector3D = GLOBAL_LIGHT_DIR.subtract( a );
-			var lightVectorB:Vector3D = GLOBAL_LIGHT_DIR.subtract( b );
-			var lightVectorC:Vector3D = GLOBAL_LIGHT_DIR.subtract( c );
-
-			a = b.subtract( a ).crossProduct( c.subtract( a ) );
-			b = a.subtract( b ).crossProduct( c.subtract( b ) );
-			c = a.subtract( c ).crossProduct( b.subtract( c ) );
+			var a:Vector3D = object3d.getLocalVector( triangle[0] );
+			var b:Vector3D = object3d.getLocalVector( triangle[0] );
+			var c:Vector3D = object3d.getLocalVector( triangle[0] );
 
 			a.normalize();
 			b.normalize();
 			c.normalize();
-			lightVectorA.normalize();
-			lightVectorB.normalize();
-			lightVectorC.normalize();
 
-			var aDot:Number = Math.max( lightVectorA.dotProduct( a ), ambience );
-			var bDot:Number = Math.max( lightVectorB.dotProduct( b ), ambience );
-			var cDot:Number = Math.max( lightVectorC.dotProduct( c ), ambience );
+			var aDot:Number = Math.max( GLOBAL_LIGHT_DIR.dotProduct( a ), ambience );
+			var bDot:Number = Math.max( GLOBAL_LIGHT_DIR.dotProduct( b ), ambience );
+			var cDot:Number = Math.max( GLOBAL_LIGHT_DIR.dotProduct( c ), ambience );
 
-			var diffuseA:Number = aDot * (1 / (1 + 0.25 * lightVectorA.length * lightVectorA.length));
-			var diffuseB:Number = bDot * (1 / (1 + 0.25 * lightVectorB.length * lightVectorB.length));
-			var diffuseC:Number = cDot * (1 / (1 + 0.25 * lightVectorC.length * lightVectorC.length));
+			var gl_ab:Number = aDot;
+			var gl_ac:Number = aDot;
 
-			var gl_ab:Number = diffuseA;
-			var gl_ac:Number = diffuseA;
-
-			var gl_stepab:Number = ( diffuseB - diffuseA ) / div_ab;
-			var gl_stepac:Number = ( diffuseC - diffuseA ) / div_ac;
-
-			trace( gl_ab, gl_ac, gl_stepab, gl_stepac );
+			var gl_stepab:Number = ( bDot - aDot ) / div_ab;
+			var gl_stepac:Number = ( cDot - aDot ) / div_ac;
 
             var stepY:int = triangle[2].y < sy ? -1 : 1;
 			
@@ -249,8 +250,7 @@ package
 					uvstepright = new Point( (triangle[2].u - triangle[1].u ) / h, (triangle[2].v - triangle[1].v) / h );
 					uvright = new Point( triangle[1].u, triangle[1].v );
 
-					gl_ab = diffuseB;
-					gl_stepab = (diffuseC - diffuseB) / h;
+					gl_stepab = (cDot - bDot) / h;
 				}
 			}
  		}
@@ -258,6 +258,12 @@ package
         /** applyLight - returns color multiplied by ambient light */
 		protected function applyLight( color:uint, strength:Number ):uint
 		{
+			// clamp
+			if ( strength > 1 )
+			{
+				strength = 1;
+			}
+
 			var rgb:Vector3D = toRGB( color );
 			// red
 			rgb.x *= strength;
