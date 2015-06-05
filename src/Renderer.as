@@ -70,7 +70,7 @@ package
 			{
 				lightRotation -= ROTATE_AMOUNT;
 				GLOBAL_LIGHT_DIR.x = Math.cos( lightRotation * Math.PI / 180 );
-				GLOBAL_LIGHT_DIR.x = Math.sin( lightRotation * Math.PI / 180 );
+				GLOBAL_LIGHT_DIR.y = Math.sin( lightRotation * Math.PI / 180 );
 			}
 			else
 			{
@@ -121,8 +121,8 @@ package
 
 			// lighting
 			var a:Vector3D = object3d.getLocalVector( triangle[0] );
-			var b:Vector3D = object3d.getLocalVector( triangle[0] );
-			var c:Vector3D = object3d.getLocalVector( triangle[0] );
+			var b:Vector3D = object3d.getLocalVector( triangle[1] );
+			var c:Vector3D = object3d.getLocalVector( triangle[2] );
 
 			a.normalize();
 			b.normalize();
@@ -262,6 +262,10 @@ package
 			if ( strength > 1 )
 			{
 				strength = 1;
+			}
+			if ( strength < 0 )
+			{
+				strength = 0;
 			}
 
 			var rgb:Vector3D = toRGB( color );

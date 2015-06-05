@@ -82,7 +82,6 @@ package
             _scaleZ = scaleZ;		
 			
             setWidthAndHeight();
-            updateTransformVertices();
 		}
 		
 		/** translate - move the transformation matrix */
@@ -91,14 +90,13 @@ package
 			_x = xval;
 			_y = yval;
 			_z = zval;
-            updateTransformVertices();
 		}
 		
 		/** populateTransformVertices - creates the list of vertex data based on the mesh */
 		protected function populateTransformVertices():void
 		{
 			_transformVertices.length = 0;
-			for ( var i:int; i < mesh.triangles.length; ++i ) 
+			for ( var i:int; i < mesh.triangles.length; i+=2 ) 
 			{
 				_transformVertices.push( new Vector.<VertexData> );
 				
@@ -106,6 +104,10 @@ package
 				{
 					_transformVertices[i].push( mesh.triangles[i][j].clone() );
 				}
+				_transformVertices.push( new Vector.<VertexData> );
+				_transformVertices[i+1].push( mesh.triangles[i+1][0].clone() );
+				_transformVertices[i+1].push( _transformVertices[i][2] );
+				_transformVertices[i+1].push( _transformVertices[i][1] );
 			}
 		}
 
@@ -138,7 +140,7 @@ package
 			_transform.prependRotation( _rotationY, Vector3D.Y_AXIS );
 			_transform.prependRotation( _rotationZ, Vector3D.Z_AXIS );
 			
-			for ( var i:int; i < _transformVertices.length; ++i ) 
+			for ( var i:int; i < _transformVertices.length; i+=2 ) 
 			{
 				for ( var j:int = 0; j < _transformVertices[i].length; ++j ) 
 				{
@@ -148,6 +150,11 @@ package
 					vertex.vector.y = Math.round( vertex.vector.y );
 					vertex.vector.z = Math.round( vertex.vector.z );
 				}
+				vertex = _transformVertices[i+1][0];
+				vertex.vector = _transform.transformVector( vertex.vector );
+				vertex.vector.x = Math.round( vertex.vector.x );
+				vertex.vector.y = Math.round( vertex.vector.y );
+				vertex.vector.z = Math.round( vertex.vector.z );
 			}
 		}
 		

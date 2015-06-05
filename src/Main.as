@@ -69,6 +69,7 @@ import flash.events.KeyboardEvent;
 			square = new Object3D( mesh );
 			square.scale( 50, 50, 1 );
 			square.translate( stage.stageWidth/2, stage.stageHeight/2, 0 );
+			square.updateTransformVertices();
 			_renderer.renderObject( square );
 		}
 		protected function onKeyDown( e:KeyboardEvent ):void
