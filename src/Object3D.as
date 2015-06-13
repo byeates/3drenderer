@@ -2,6 +2,7 @@ package
 {
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
+	import flash.geom.Vector3D;
 	
 	/**
 	 * ...
@@ -48,7 +49,7 @@ package
 			_transform = new Matrix3D();
             _transformVertices = new Vector.<Vector.<VertexData>>;
 			this.mesh = mesh;
-			populateTransformVertices();
+			//
             setWidthAndHeight();
         }
 
@@ -91,25 +92,6 @@ package
 			_y = yval;
 			_z = zval;
 		}
-		
-		/** populateTransformVertices - creates the list of vertex data based on the mesh */
-		protected function populateTransformVertices():void
-		{
-			_transformVertices.length = 0;
-			for ( var i:int; i < mesh.triangles.length; i+=2 ) 
-			{
-				_transformVertices.push( new Vector.<VertexData> );
-				
-				for ( var j:int = 0; j < mesh.triangles[i].length; ++j ) 
-				{
-					_transformVertices[i].push( mesh.triangles[i][j].clone() );
-				}
-				_transformVertices.push( new Vector.<VertexData> );
-				_transformVertices[i+1].push( mesh.triangles[i+1][0].clone() );
-				_transformVertices[i+1].push( _transformVertices[i][2] );
-				_transformVertices[i+1].push( _transformVertices[i][1] );
-			}
-		}
 
 		/** returns a vertice in objects local coordinate space
 		 * @param vertex - an existing transformed vertex
@@ -122,39 +104,59 @@ package
 				{
 					if ( _transformVertices[i][j] == vertex )
 					{
-						return mesh.triangles[i][j].vector.clone();
+						return mesh.lookup( vertex.vector ).clone();
 					}
 				}
 			}
 			return null;
 		}
+
+		protected function resetVertices():void
+		{
+			for( var i:int; i < _transformVertices.length; i++ )
+			{
+				for ( var j:int=0; j < _transformVertices[i].length; ++j )
+				{
+					var objectCoordinate:Vector3D = mesh.lookup( _transformVertices[i][j].vector );
+					_transformVertices[i][j].x = objectCoordinate.x;
+					_transformVertices[i][j].y = objectCoordinate.y;
+					_transformVertices[i][j].z = objectCoordinate.z;
+				}
+			}
+		}
 		
 		/** updateTransformVertices - updates the vertices according to the transform */
 		public function updateTransformVertices():void
 		{
-			populateTransformVertices();
+			_transformVertices = mesh.triangles;
+			resetVertices();
+
 			_transform.identity();
 			_transform.appendScale( _scaleX, _scaleY, _scaleZ );
 			_transform.appendTranslation( _x, _y, _z );
 			_transform.prependRotation( _rotationX, Vector3D.X_AXIS );
 			_transform.prependRotation( _rotationY, Vector3D.Y_AXIS );
 			_transform.prependRotation( _rotationZ, Vector3D.Z_AXIS );
-			
-			for ( var i:int; i < _transformVertices.length; i+=2 ) 
+			transformVectors();
+		}
+
+		protected function transformVectors():void
+		{
+			var ignoreList:Vector.<Vector3D> = new <Vector3D>[];
+			for ( var i:int; i < _transformVertices.length; i++ )
 			{
-				for ( var j:int = 0; j < _transformVertices[i].length; ++j ) 
+				for ( var j:int = 0; j < _transformVertices[i].length; ++j )
 				{
-					var vertex:VertexData = _transformVertices[i][j];
-					vertex.vector = _transform.transformVector( vertex.vector );
-					vertex.vector.x = Math.round( vertex.vector.x );
-					vertex.vector.y = Math.round( vertex.vector.y );
-					vertex.vector.z = Math.round( vertex.vector.z );
+					if ( ignoreList.indexOf( _transformVertices[i][j].vector ) == -1 )
+					{
+						var vertex:VertexData = _transformVertices[i][j];
+						var vt:Vector3D = _transform.transformVector( vertex.vector );
+						vertex.vector.x = Math.round( vt.x );
+						vertex.vector.y = Math.round( vt.y );
+						vertex.vector.z = Math.round( vt.z );
+						ignoreList.push( _transformVertices[i][j].vector )
+					}
 				}
-				vertex = _transformVertices[i+1][0];
-				vertex.vector = _transform.transformVector( vertex.vector );
-				vertex.vector.x = Math.round( vertex.vector.x );
-				vertex.vector.y = Math.round( vertex.vector.y );
-				vertex.vector.z = Math.round( vertex.vector.z );
 			}
 		}
 		

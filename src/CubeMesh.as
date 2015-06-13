@@ -3,9 +3,10 @@
  */
 package
 {
-import flash.display.Bitmap;
+	import flash.display.Bitmap;
+	import flash.geom.Vector3D;
 
-public class CubeMesh extends MeshData
+	public class CubeMesh extends MeshData
 	{
 		/*=========================================================================================
 		CONSTRUCTOR
@@ -42,17 +43,17 @@ public class CubeMesh extends MeshData
                 new <VertexData>
                 [
                     new VertexData( -1, -1, -1 ),
-                    new VertexData( -1, -1,  1 ),
+                    triangles[0][0].clone(false),
                     new VertexData( -1,  1, -1 )
                 ]);
             // bottom tri
-            triangles.push(
-                new <VertexData>
-                [
-                    new VertexData( -1,  1,  1 ),
-                    triangles[2][2],
-                    triangles[2][1]
-                ]);
+           triangles.push(
+               new <VertexData>
+               [
+                   triangles[0][2].clone(false),
+                   triangles[2][2],
+                   triangles[2][1]
+               ]);
 
             // =============================
             // BACK FACE
@@ -61,7 +62,7 @@ public class CubeMesh extends MeshData
                 new <VertexData>
                 [
                     new VertexData(  1, -1, -1 ),
-                    new VertexData( -1, -1, -1 ),
+                    triangles[2][0].clone(false),
                     new VertexData(  1,  1, -1 )
                 ]);
 
@@ -69,7 +70,7 @@ public class CubeMesh extends MeshData
             triangles.push(
                 new <VertexData>
                 [
-                    new VertexData( -1, 1, -1 ),
+                    triangles[2][2].clone(false),
                     triangles[4][2],
                     triangles[4][1]
                 ]);
@@ -80,16 +81,16 @@ public class CubeMesh extends MeshData
             triangles.push(
                 new <VertexData>
                 [
-                    new VertexData(  1, -1,  1 ),
-                    new VertexData(  1, -1, -1 ),
-                    new VertexData(  1,  1,  1 )
+                    triangles[0][1].clone(false),
+                    triangles[4][0].clone(false),
+                    triangles[1][0].clone(false)
                 ]);
 
             // bottom tri
             triangles.push(
                 new <VertexData>
                 [
-                    new VertexData( 1, 1, -1 ),
+                    triangles[4][2].clone(false),
                     triangles[6][2],
                     triangles[6][1]
                 ]);
@@ -100,16 +101,16 @@ public class CubeMesh extends MeshData
             triangles.push(
                 new <VertexData>
                 [
-                    new VertexData( -1, -1, -1 ),
-                    new VertexData(  1, -1, -1 ),
-                    new VertexData( -1, -1,  1 )
+                    triangles[2][0].clone(false),
+                    triangles[4][0].clone(false),
+                    triangles[0][0].clone(false)
                 ]);
 
             // bottom tri
             triangles.push(
                 new <VertexData>
                 [
-                    new VertexData( 1, -1, 1 ),
+                    triangles[0][1].clone(false),
                     triangles[8][2],
                     triangles[8][1]
                 ]);
@@ -120,19 +121,41 @@ public class CubeMesh extends MeshData
             triangles.push(
                 new <VertexData>
                 [
-                    new VertexData( -1, 1,  1 ),
-                    new VertexData(  1, 1,  1 ),
-                    new VertexData( -1, 1, -1 )
+                    triangles[0][2].clone(false),
+                    triangles[1][0].clone(false),
+                    triangles[2][2].clone(false)
                 ]);
 
             // bottom tri
             triangles.push(
                 new <VertexData>
                 [
-                    new VertexData( 1, 1, -1 ),
+                    triangles[4][2].clone(false),
                     triangles[10][2],
                     triangles[10][1]
                 ]);
+
+			// store shared vertices object coordinates in lookup
+			sharedVertices[ triangles[0][0].vector ] = triangles[0][0].vector.clone();
+			sharedVertices[ triangles[0][1].vector ] = triangles[0][1].vector.clone();
+			sharedVertices[ triangles[0][2].vector ] = triangles[0][2].vector.clone();
+			sharedVertices[ triangles[1][0].vector ] = triangles[1][0].vector.clone();
+			sharedVertices[ triangles[2][0].vector ] = triangles[2][0].vector.clone();
+			sharedVertices[ triangles[2][2].vector ] = triangles[2][2].vector.clone();
+			sharedVertices[ triangles[4][0].vector ] = triangles[4][0].vector.clone();
+			sharedVertices[ triangles[4][2].vector ] = triangles[4][2].vector.clone();
+		}
+
+		override public function lookup( vector:Vector3D ):Vector3D
+		{
+			for ( var vec:* in sharedVertices )
+			{
+				if ( vec == vector )
+				{
+					return sharedVertices[ vec ];
+				}
+			}
+			return null;
 		}
 
 		override public function setUVData( texture:Bitmap ):void

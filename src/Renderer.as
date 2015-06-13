@@ -47,9 +47,9 @@ package
 				var v0:Vector3D = triangle[0].clone().vector;
 				var v1:Vector3D = triangle[1].clone().vector;
 				var v2:Vector3D = triangle[2].clone().vector;
-				
+
 				var n:Vector3D = v1.subtract( v0 ).crossProduct( v2.subtract( v0 ) );
-				
+
 				if ( n.z > 0 )
 				{
 					triangles.push( triangle );
@@ -101,23 +101,12 @@ package
 			{
 				return;
 			}
+			var order:Vector.<VertexData> = new Vector.<VertexData>();
+			order.push( triangle[0] );
+			order.push( triangle[1] );
+			order.push( triangle[2] );
 
 			triangle.sort( sortByHeight );
-			
-			var firstPass:Boolean;
-			
-			var sx:Number = triangle[0].x;
-			var sy:Number = triangle[0].y;
-			var endX:Number = sx;
-			var endY:Number = sy;
-			var acheight:Number = triangle[2].y - sy;
-			var abheight:Number = triangle[1].y - sy;
-			
-			var acstepX:Number = ( triangle[2].x - sx ) / (triangle[2].y - sy != 0 ? triangle[2].y - sy : 1);
-			var abstepX:Number = (triangle[1].x - sx ) / (triangle[1].y - sy != 0 ? triangle[1].y - sy : 1);
-			
-			var div_ac:Number = acheight == 0 ? 1 : acheight;
-			var div_ab:Number = abheight == 0 ? 1 : abheight;
 
 			// lighting
 			var a:Vector3D = object3d.getLocalVector( triangle[0] );
@@ -134,6 +123,23 @@ package
 
 			var gl_ab:Number = aDot;
 			var gl_ac:Number = aDot;
+
+
+			var firstPass:Boolean;
+
+			var sx:Number = triangle[0].x;
+			var sy:Number = triangle[0].y;
+			var endX:Number = sx;
+			var endY:Number = sy;
+			var acheight:Number = triangle[2].y - sy;
+			var abheight:Number = triangle[1].y - sy;
+
+			var acstepX:Number = ( triangle[2].x - sx ) / (triangle[2].y - sy != 0 ? triangle[2].y - sy : 1);
+			var abstepX:Number = (triangle[1].x - sx ) / (triangle[1].y - sy != 0 ? triangle[1].y - sy : 1);
+
+			var div_ac:Number = acheight == 0 ? 1 : acheight;
+			var div_ab:Number = abheight == 0 ? 1 : abheight;
+
 
 			var gl_stepab:Number = ( bDot - aDot ) / div_ab;
 			var gl_stepac:Number = ( cDot - aDot ) / div_ac;
@@ -253,6 +259,9 @@ package
 					gl_stepab = (cDot - bDot) / h;
 				}
 			}
+			triangle[0] = order[0];
+			triangle[1] = order[1];
+			triangle[2] = order[2];
  		}
 
         /** applyLight - returns color multiplied by ambient light */

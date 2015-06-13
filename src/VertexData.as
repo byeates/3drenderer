@@ -12,7 +12,6 @@ package
 	public class VertexData
 	{
 		public var vector:Vector3D;
-        public var normal:Vector3D;
 		
 		// values 0-1 (representing 0-255)
 		public var red:Number;
@@ -45,7 +44,7 @@ package
 		}
 		
 		/** returns a copy of this vertex instance */
-		public function clone():VertexData
+		public function clone(cloneVector:Boolean=true):VertexData
 		{
 			var vertex:VertexData = new VertexData( x, y, z );
 			vertex.u = this.u;
@@ -53,16 +52,14 @@ package
 			vertex.uvMap = uvMap;
 			vertex.clamp = this.clamp;
 			vertex.setColorData( red, green, blue );
+
+			if ( !cloneVector )
+			{
+				vertex.vector = this.vector;
+			}
+
 			return vertex;
 		}
-
-        /** returns a normalized vector3d of this vertex */
-        public function normalize():Vector3D
-        {
-            var v:Vector3D = new Vector3D( x, y, z );
-            v.normalize();
-            return v;
-        }
 		
 		public function set x( val:Number ):void
 		{

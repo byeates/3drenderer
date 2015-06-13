@@ -1,8 +1,10 @@
 package
 {
-import flash.display.Bitmap;
+	import flash.display.Bitmap;
+	import flash.geom.Vector3D;
+	import flash.utils.Dictionary;
 
-/**
+	/**
 	 * ...
 	 * @author Bennett Yeates
 	 * 
@@ -17,7 +19,8 @@ import flash.display.Bitmap;
 		// =============================
 		/** list of vertices for polygons */
 		public var triangles:Vector.<Vector.<VertexData>>;
-		
+		public var sharedVertices:Dictionary;
+
 		// =============================
 		// PROTECTED
 		// =============================	
@@ -30,12 +33,18 @@ import flash.display.Bitmap;
 		public function MeshData()
 		{
 			triangles = new Vector.<Vector.<VertexData>>();
+			sharedVertices = new Dictionary();
 			_uvmap = new Vector.<VertexData>();
 		}
 		
 		public function setUVData( texture:Bitmap ):void
 		{
 			//should be implemented by sub classes 
+		}
+
+		public function lookup( vector:Vector3D ):Vector3D
+		{
+			return null;
 		}
 	}
 }
