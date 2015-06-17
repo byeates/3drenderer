@@ -3,8 +3,9 @@ package
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
-import flash.events.Event;
-import flash.events.KeyboardEvent;
+	import flash.events.Event;
+	import flash.events.KeyboardEvent;
+	import flash.geom.Vector3D;
 	import flash.ui.Keyboard;
 	
 	/**
@@ -67,6 +68,7 @@ import flash.events.KeyboardEvent;
 			mesh.setUVData( Textures.getMap( "brick" ) );
 
 			square = new Object3D( mesh );
+			square.addLightSource( new Vector3D( 0, 0, 1 ) );
 			square.scale( 50, 50, 1 );
 			square.translate( stage.stageWidth/2, stage.stageHeight/2, 0 );
 			square.updateTransformVertices();

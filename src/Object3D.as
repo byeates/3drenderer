@@ -2,7 +2,6 @@ package
 {
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
-	import flash.geom.Vector3D;
 	
 	/**
 	 * ...
@@ -18,6 +17,9 @@ package
 		// PUBLIC
 		// =============================
 		public var mesh:MeshData;
+		
+		/** list of lights that apply to this object */
+		public var lights:Vector.<Vector3D>;
 		
 		// =============================
 		// PROTECTED
@@ -35,7 +37,10 @@ package
         protected var _scaleY:Number = 0;
         protected var _scaleZ:Number = 0;
 		protected var _transform:Matrix3D;
+		
+		/** comprehensive list of vertices for each polygon, this includes duplicates */
 		protected var _transformVertices:Vector.<Vector.<VertexData>>;
+		
 
 		// =============================
 		// PRIVATE
@@ -48,6 +53,7 @@ package
 		{
 			_transform = new Matrix3D();
             _transformVertices = new Vector.<Vector.<VertexData>>;
+			lights = new Vector.<Vector3D>;
 			this.mesh = mesh;
 			//
             setWidthAndHeight();
@@ -138,6 +144,7 @@ package
 			_transform.prependRotation( _rotationY, Vector3D.Y_AXIS );
 			_transform.prependRotation( _rotationZ, Vector3D.Z_AXIS );
 			transformVectors();
+			transformLights();
 		}
 
 		protected function transformVectors():void
@@ -158,6 +165,28 @@ package
 					}
 				}
 			}
+		}
+		
+		/** transformLights - updates all the lights according to the transform transpose */
+		protected function transformLights():void
+		{
+			var t:Matrix3D = new Matrix3D();
+			t.identity();
+			t.prependRotation( _rotationX, Vector3D.X_AXIS );
+			t.prependRotation( _rotationY, Vector3D.Y_AXIS );
+			t.prependRotation( _rotationZ, Vector3D.Z_AXIS );
+			t.transpose();
+			for ( var i:int; i < lights.length; ++i ) 
+			{
+				var vector:Vector3D = t.transformVector( lights[ i ] );
+				lights[i] = new Vector3D( vector.x, vector.y, vector.z );
+			}
+		}
+		
+		public function addLightSource( v:Vector3D ):void
+		{
+			//v.normalize();
+			lights.push( v );
 		}
 		
 		/** returns the list of vertex data according to the transforms */

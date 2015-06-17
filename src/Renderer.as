@@ -27,7 +27,7 @@ package
 		// CONST
 		// =============================
 		protected static const CAMERA_VIEW:Vector3D = new Vector3D( 0, 0, 1 );
-        protected static var GLOBAL_LIGHT_DIR:Vector3D = new Vector3D( 0, 0, 1 );
+        //protected static var GLOBAL_LIGHT_DIR:Vector3D = new Vector3D( 0, 0, 1 );
 		protected static const ROTATE_AMOUNT:int = 5;
 		
 		/*=========================================================================================
@@ -66,7 +66,7 @@ package
 
 		public function rotateLight( dir:int=-1 ):void
 		{
-			if ( dir < 0 )
+			/*if ( dir < 0 )
 			{
 				lightRotation -= ROTATE_AMOUNT;
 				GLOBAL_LIGHT_DIR.x = Math.cos( lightRotation * Math.PI / 180 );
@@ -77,7 +77,7 @@ package
 				lightRotation += ROTATE_AMOUNT;
 				GLOBAL_LIGHT_DIR.y = Math.sin( lightRotation * Math.PI / 180 );
 				GLOBAL_LIGHT_DIR.x = Math.cos( lightRotation * Math.PI / 180 );
-			}
+			}*/
 		}
 		
 		public function clear():void
@@ -117,13 +117,12 @@ package
 			b.normalize();
 			c.normalize();
 
-			var aDot:Number = Math.max( GLOBAL_LIGHT_DIR.dotProduct( a ), ambience );
-			var bDot:Number = Math.max( GLOBAL_LIGHT_DIR.dotProduct( b ), ambience );
-			var cDot:Number = Math.max( GLOBAL_LIGHT_DIR.dotProduct( c ), ambience );
+			var aDot:Number = Math.max( object3d.lights[0].dotProduct( a ), ambience );
+			var bDot:Number = Math.max( object3d.lights[0].dotProduct( b ), ambience );
+			var cDot:Number = Math.max( object3d.lights[0].dotProduct( c ), ambience );
 
 			var gl_ab:Number = aDot;
 			var gl_ac:Number = aDot;
-
 
 			var firstPass:Boolean;
 
