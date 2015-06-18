@@ -123,12 +123,12 @@ package
 							break;
 
 						case Keyboard.A:
-							_renderer.rotateLight();
+							_renderer.rotateLight(square);
 							doRedraw = true;
 							break;
 
 						case Keyboard.D:
-							_renderer.rotateLight( 1 );
+							_renderer.rotateLight( square, 1 );
 							doRedraw = true;
 							break;
                     }

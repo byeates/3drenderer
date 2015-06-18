@@ -64,20 +64,24 @@ package
 			ambience += value;
 		}
 
-		public function rotateLight( dir:int=-1 ):void
+		public function rotateLight( object:Object3D, dir:int=-1 ):void
 		{
-			/*if ( dir < 0 )
+			var light:Vector3D = object.currentLight;
+			var x:Number, y:Number, z:Number = 0;
+			if ( dir < 0 )
 			{
 				lightRotation -= ROTATE_AMOUNT;
-				GLOBAL_LIGHT_DIR.x = Math.cos( lightRotation * Math.PI / 180 );
-				GLOBAL_LIGHT_DIR.y = Math.sin( lightRotation * Math.PI / 180 );
+				x = Math.cos( lightRotation * Math.PI / 180 );
+				y = Math.sin( lightRotation * Math.PI / 180 );
+				object.transformCurrentLight( x, y, z );
 			}
 			else
 			{
 				lightRotation += ROTATE_AMOUNT;
-				GLOBAL_LIGHT_DIR.y = Math.sin( lightRotation * Math.PI / 180 );
-				GLOBAL_LIGHT_DIR.x = Math.cos( lightRotation * Math.PI / 180 );
-			}*/
+				y = Math.sin( lightRotation * Math.PI / 180 );
+				x = Math.cos( lightRotation * Math.PI / 180 );
+				object.transformCurrentLight( x, y, z );
+			}
 		}
 		
 		public function clear():void
@@ -117,9 +121,9 @@ package
 			b.normalize();
 			c.normalize();
 
-			var aDot:Number = Math.max( object3d.lights[0].dotProduct( a ), ambience );
-			var bDot:Number = Math.max( object3d.lights[0].dotProduct( b ), ambience );
-			var cDot:Number = Math.max( object3d.lights[0].dotProduct( c ), ambience );
+			var aDot:Number = Math.max( object3d.getLights().dotProduct( a ), ambience );
+			var bDot:Number = Math.max( object3d.getLights().dotProduct( b ), ambience );
+			var cDot:Number = Math.max( object3d.getLights().dotProduct( c ), ambience );
 
 			var gl_ab:Number = aDot;
 			var gl_ac:Number = aDot;

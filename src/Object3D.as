@@ -17,9 +17,8 @@ package
 		// PUBLIC
 		// =============================
 		public var mesh:MeshData;
+		public var currentLight:Vector3D;
 		
-		/** list of lights that apply to this object */
-		public var lights:Vector.<Vector3D>;
 		
 		// =============================
 		// PROTECTED
@@ -38,6 +37,9 @@ package
         protected var _scaleZ:Number = 0;
 		protected var _transform:Matrix3D;
 		
+		/** list of lights that apply to this object */
+		protected var _lights:Vector.<Vector3D>;
+		
 		/** comprehensive list of vertices for each polygon, this includes duplicates */
 		protected var _transformVertices:Vector.<Vector.<VertexData>>;
 		
@@ -53,7 +55,7 @@ package
 		{
 			_transform = new Matrix3D();
             _transformVertices = new Vector.<Vector.<VertexData>>;
-			lights = new Vector.<Vector3D>;
+			_lights = new Vector.<Vector3D>;
 			this.mesh = mesh;
 			//
             setWidthAndHeight();
@@ -171,22 +173,34 @@ package
 		protected function transformLights():void
 		{
 			var t:Matrix3D = new Matrix3D();
-			t.identity();
 			t.prependRotation( _rotationX, Vector3D.X_AXIS );
 			t.prependRotation( _rotationY, Vector3D.Y_AXIS );
 			t.prependRotation( _rotationZ, Vector3D.Z_AXIS );
 			t.transpose();
-			for ( var i:int; i < lights.length; ++i ) 
+			
+			for ( var i:int; i < _lights.length; ++i ) 
 			{
-				var vector:Vector3D = t.transformVector( lights[ i ] );
-				lights[i] = new Vector3D( vector.x, vector.y, vector.z );
+				var vector:Vector3D = t.transformVector( _lights[ i ].clone() );
+				currentLight = new Vector3D( vector.x, vector.y, vector.z );
+				trace( currentLight );
 			}
 		}
 		
 		public function addLightSource( v:Vector3D ):void
 		{
-			//v.normalize();
-			lights.push( v );
+			_lights.push( v );
+		}
+		
+		public function getLights():Vector3D
+		{
+			return currentLight;
+		}
+		
+		public function transformCurrentLight( x:Number, y:Number, z:Number ):void
+		{
+			_lights[ 0 ].x = x;
+			_lights[ 0 ].y = y;
+			_lights[ 0 ].z = z;
 		}
 		
 		/** returns the list of vertex data according to the transforms */
