@@ -109,45 +109,44 @@ package
 			order.push( triangle[0] );
 			order.push( triangle[1] );
 			order.push( triangle[2] );
-
+			
 			triangle.sort( sortByHeight );
-
+			
 			// lighting
 			var a:Vector3D = object3d.getLocalVector( triangle[0] );
 			var b:Vector3D = object3d.getLocalVector( triangle[1] );
 			var c:Vector3D = object3d.getLocalVector( triangle[2] );
-
+			
 			a.normalize();
 			b.normalize();
 			c.normalize();
-
+			
 			var aDot:Number = Math.max( object3d.getLights().dotProduct( a ), ambience );
 			var bDot:Number = Math.max( object3d.getLights().dotProduct( b ), ambience );
 			var cDot:Number = Math.max( object3d.getLights().dotProduct( c ), ambience );
-
+			
 			var gl_ab:Number = aDot;
 			var gl_ac:Number = aDot;
-
+			
 			var firstPass:Boolean;
-
+			
 			var sx:Number = triangle[0].x;
 			var sy:Number = triangle[0].y;
 			var endX:Number = sx;
 			var endY:Number = sy;
 			var acheight:Number = triangle[2].y - sy;
 			var abheight:Number = triangle[1].y - sy;
-
+			
 			var acstepX:Number = ( triangle[2].x - sx ) / (triangle[2].y - sy != 0 ? triangle[2].y - sy : 1);
 			var abstepX:Number = (triangle[1].x - sx ) / (triangle[1].y - sy != 0 ? triangle[1].y - sy : 1);
-
+			
 			var div_ac:Number = acheight == 0 ? 1 : acheight;
 			var div_ab:Number = abheight == 0 ? 1 : abheight;
-
-
+			
 			var gl_stepab:Number = ( bDot - aDot ) / div_ab;
 			var gl_stepac:Number = ( cDot - aDot ) / div_ac;
-
-            var stepY:int = triangle[2].y < sy ? -1 : 1;
+			
+			var stepY:int = triangle[2].y < sy ? -1 : 1;
 			
 			// a to c vertex steps
 			var acstepRed:Number = (triangle[2].red - triangle[0].red) / div_ac;

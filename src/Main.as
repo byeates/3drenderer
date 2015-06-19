@@ -5,6 +5,7 @@ package
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
 	import flash.geom.Vector3D;
 	import flash.ui.Keyboard;
 	
@@ -22,13 +23,15 @@ package
 		// =============================
 		// PUBLIC
 		// =============================
-		public var square:Object3D;
+		public var cube:Object3D;
 		
 		// =============================
 		// PROTECTED
 		// =============================
 		protected var _renderer:Renderer;
 		protected var _canvas:BitmapData;
+		protected var _camera:Camera;
+		protected var _isMouseDown:Boolean;
 		
 		// =============================
 		// PRIVATE
@@ -59,21 +62,25 @@ package
 			addChild( new Bitmap( _canvas ) );
 
 			_renderer = new Renderer( _canvas );
+			_camera = new Camera();
 
 			addEventListener( Event.ENTER_FRAME, update );
             stage.addEventListener( KeyboardEvent.KEY_DOWN, onKeyDown );
             stage.addEventListener( KeyboardEvent.KEY_UP, onKeyUp );
+			stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+			stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 
 			var mesh:MeshData = new CubeMesh();
 			mesh.setUVData( Textures.getMap( "brick" ) );
 
-			square = new Object3D( mesh );
-			square.addLightSource( new Vector3D( 0, 0, 1 ) );
-			square.scale( 50, 50, 1 );
-			square.translate( stage.stageWidth/2, stage.stageHeight/2, 0 );
-			square.updateTransformVertices();
-			_renderer.renderObject( square );
+			cube = new Object3D( mesh );
+			cube.addLightSource( new Vector3D( 0, 0, 1 ) );
+			cube.scale( 50, 50, 1 );
+			cube.translate( stage.stageWidth/2, stage.stageHeight/2, 0 );
+			cube.updateTransformVertices();
+			_renderer.renderObject( cube );
 		}
+		
 		protected function onKeyDown( e:KeyboardEvent ):void
         {
             _keys[ e.keyCode ] = true;
@@ -82,6 +89,16 @@ package
         {
             _keys[ e.keyCode ] = false;
         }
+		
+		protected function onMouseDown( e:MouseEvent ):void
+		{
+			_isMouseDown = true;
+		}
+		
+		protected function onMouseUp( e:MouseEvent ):void
+		{
+			_isMouseDown = false;
+		}
 
 		protected function update(event:Event):void
 		{
@@ -93,22 +110,50 @@ package
                     switch( int(key) )
                     {
                         case Keyboard.DOWN:
-                            square.rotationX += MOVE_PIXELS_BY;
+							if ( _isMouseDown )
+							{
+								_camera.y -= MOVE_PIXELS_BY;
+							}
+							else
+							{
+                            	_camera.z -= MOVE_PIXELS_BY;
+							}
                             doRedraw = true;
                             break;
 
                         case Keyboard.UP:
-                            square.rotationX -= MOVE_PIXELS_BY;
+							if ( _isMouseDown )
+							{
+								_camera.y += MOVE_PIXELS_BY;
+							}
+							else
+							{
+								_camera.z += MOVE_PIXELS_BY;
+							}
                             doRedraw = true;
                             break;
 
                         case Keyboard.LEFT:
-                            square.rotationY -= MOVE_PIXELS_BY;
+							if ( _isMouseDown )
+							{
+								_camera.rotationY -= MOVE_PIXELS_BY;
+							}
+							else
+							{
+								_camera.x -= MOVE_PIXELS_BY;
+							}
                             doRedraw = true;
                             break;
 
                         case Keyboard.RIGHT:
-                            square.rotationY += MOVE_PIXELS_BY;
+							if ( _isMouseDown )
+							{
+								_camera.rotationY += MOVE_PIXELS_BY;
+							}
+							else
+							{
+								_camera.x += MOVE_PIXELS_BY;								
+							}
                             doRedraw = true;
                             break;
 
@@ -123,12 +168,12 @@ package
 							break;
 
 						case Keyboard.A:
-							_renderer.rotateLight(square);
+							_renderer.rotateLight(cube);
 							doRedraw = true;
 							break;
 
 						case Keyboard.D:
-							_renderer.rotateLight( square, 1 );
+							_renderer.rotateLight( cube, 1 );
 							doRedraw = true;
 							break;
                     }
@@ -137,7 +182,7 @@ package
 
             if ( doRedraw )
             {
-                square.updateTransformVertices();
+                cube.updateTransformVertices();
                 redraw();
             }
         }
@@ -145,7 +190,7 @@ package
 		private function redraw():void
 		{
 			_renderer.clear();
-			_renderer.renderObject( square );
+			_renderer.renderObject( cube );
 		}
 		
 		private function createGrid():void

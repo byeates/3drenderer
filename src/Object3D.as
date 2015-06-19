@@ -59,7 +59,13 @@ package
 			this.mesh = mesh;
 			//
             setWidthAndHeight();
+			Global.addChild( this );
         }
+		
+		public function destroy():void
+		{
+			Global.removeChild( this );
+		}
 
         private function setWidthAndHeight():void
         {
@@ -182,7 +188,6 @@ package
 			{
 				var vector:Vector3D = t.transformVector( _lights[ i ].clone() );
 				currentLight = new Vector3D( vector.x, vector.y, vector.z );
-				trace( currentLight );
 			}
 		}
 		
