@@ -1,5 +1,7 @@
 package
 {
+	import flash.geom.Matrix3D;
+	import flash.geom.Vector3D;
 	
 	/**
 	 * ...
@@ -41,6 +43,16 @@ package
 			this.x = x;
 			this.y = y;
 			this.z = z;
+		}
+		
+		public function get transform():Matrix3D
+		{
+			var mat:Matrix3D = new Matrix3D();
+			mat.appendTranslation( x, y, z );
+			mat.prependRotation( rotationX, Vector3D.X_AXIS );
+			mat.prependRotation( rotationY, Vector3D.Y_AXIS );
+			mat.prependRotation( rotationZ, Vector3D.Z_AXIS );
+			return mat;
 		}
 	}
 }
