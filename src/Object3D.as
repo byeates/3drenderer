@@ -144,13 +144,18 @@ package
 		{
 			_transformVertices = mesh.triangles;
 			resetVertices();
-
+			
 			_transform.identity();
-			_transform.appendScale( _scaleX, _scaleY, _scaleZ );
+			//_transform.appendScale( _scaleX, _scaleY, _scaleZ );
 			_transform.appendTranslation( _x, _y, _z );
 			_transform.prependRotation( _rotationX, Vector3D.X_AXIS );
 			_transform.prependRotation( _rotationY, Vector3D.Y_AXIS );
 			_transform.prependRotation( _rotationZ, Vector3D.Z_AXIS );
+			
+			_transform = Camera.instance.toCamera( _transform );
+			//trace( _transform.transformVector( new Vector3D ) );
+			//trace( _transform.transformVector( new Vector3D ) );
+			
 			transformVectors();
 			transformLights();
 		}

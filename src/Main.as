@@ -30,7 +30,6 @@ package
 		// =============================
 		protected var _renderer:Renderer;
 		protected var _canvas:BitmapData;
-		protected var _camera:Camera;
 		protected var _isMouseDown:Boolean;
 		
 		// =============================
@@ -46,7 +45,7 @@ package
 		private static const GRID_LINE_COLOR:int = 0x333333;
 		private static const GRID_COLUMN_SIZE:int = 25;
 		private static const GRID_ROW_SIZE:int = 25;
-		private static const MOVE_PIXELS_BY:int = 5;
+		private static const MOVE_PIXELS_BY:Number = 1;
 
 		/*=========================================================================================
 		CONSTRUCTOR
@@ -62,7 +61,6 @@ package
 			addChild( new Bitmap( _canvas ) );
 
 			_renderer = new Renderer( _canvas );
-			_camera = new Camera();
 
 			addEventListener( Event.ENTER_FRAME, update );
             stage.addEventListener( KeyboardEvent.KEY_DOWN, onKeyDown );
@@ -75,8 +73,8 @@ package
 
 			cube = new Object3D( mesh );
 			cube.addLightSource( new Vector3D( 0, 0, 1 ) );
-			cube.scale( 50, 50, 1 );
-			cube.translate( stage.stageWidth/2, stage.stageHeight/2, 0 );
+			//cube.scale( 50, 50, 1 );
+			cube.translate( 0, 0, -100 );
 			cube.updateTransformVertices();
 			_renderer.renderObject( cube );
 		}
@@ -112,11 +110,11 @@ package
                         case Keyboard.DOWN:
 							if ( _isMouseDown )
 							{
-								_camera.y -= MOVE_PIXELS_BY;
+								Camera.instance.y -= MOVE_PIXELS_BY;
 							}
 							else
 							{
-                            	_camera.z -= MOVE_PIXELS_BY;
+                            	Camera.instance.rotationZ -= MOVE_PIXELS_BY;
 							}
                             doRedraw = true;
                             break;
@@ -124,11 +122,11 @@ package
                         case Keyboard.UP:
 							if ( _isMouseDown )
 							{
-								_camera.y += MOVE_PIXELS_BY;
+								Camera.instance.y += MOVE_PIXELS_BY;
 							}
 							else
 							{
-								_camera.z += MOVE_PIXELS_BY;
+								Camera.instance.rotationZ += MOVE_PIXELS_BY;
 							}
                             doRedraw = true;
                             break;
@@ -136,11 +134,11 @@ package
                         case Keyboard.LEFT:
 							if ( _isMouseDown )
 							{
-								_camera.rotationY -= MOVE_PIXELS_BY;
+								Camera.instance.rotationX -= MOVE_PIXELS_BY;
 							}
 							else
 							{
-								_camera.x -= MOVE_PIXELS_BY;
+								Camera.instance.x -= MOVE_PIXELS_BY;
 							}
                             doRedraw = true;
                             break;
@@ -148,11 +146,11 @@ package
                         case Keyboard.RIGHT:
 							if ( _isMouseDown )
 							{
-								_camera.rotationY += MOVE_PIXELS_BY;
+								Camera.instance.rotationX += MOVE_PIXELS_BY;
 							}
 							else
 							{
-								_camera.x += MOVE_PIXELS_BY;								
+								Camera.instance.x += MOVE_PIXELS_BY;								
 							}
                             doRedraw = true;
                             break;
@@ -179,12 +177,10 @@ package
                     }
                 }
             }
-
-            if ( doRedraw )
-            {
-                cube.updateTransformVertices();
-                redraw();
-            }
+			
+			cube.rotationY += 5;
+			cube.updateTransformVertices();
+			redraw();
         }
 
 		private function redraw():void

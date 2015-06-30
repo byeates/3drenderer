@@ -314,18 +314,6 @@ package
 			return a.y - b.y;
 		}
 		
-		/** sorting method for returning vector ordered by x position low to high */
-		protected function sortByWidth( a:VertexData, b:VertexData ):Number
-		{
-			return a.x - b.x;
-		}
-		
-		/** sorting method for returning vector ordered by z position low to high */
-		protected function sortByZ( a:VertexData, b:VertexData ):Number
-		{
-			return a.z - b.z;
-		}
-		
 		protected function toRGB( color:uint ):Vector3D
 		{
 			var r:Number = color >> 16 & 0xFF;
@@ -340,12 +328,6 @@ package
 			var g:Number = ( vertex.green * 255 ) << 8;
 			var b:Number = vertex.blue * 255;
 			return r + g + b;
-		}
-		
-		protected function getWidth( triangle:Vector.<VertexData> ):Number
-		{
-			triangle.sort( sortByWidth );
-			return triangle[2].x - triangle[0].x;
 		}
 	}
 }
