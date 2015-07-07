@@ -74,7 +74,7 @@ package
 			cube = new Object3D( mesh );
 			cube.addLightSource( new Vector3D( 0, 0, 1 ) );
 			//cube.scale( 50, 50, 1 );
-			cube.translate( 0, 0, -100 );
+			cube.translate( 0, 0, 2000 );
 			cube.updateTransformVertices();
 			_renderer.renderObject( cube );
 		}
@@ -114,7 +114,7 @@ package
 							}
 							else
 							{
-                            	Camera.instance.rotationZ -= MOVE_PIXELS_BY;
+                            	Camera.instance.rotationZ -= MOVE_PIXELS_BY * 10;
 							}
                             doRedraw = true;
                             break;
@@ -126,7 +126,7 @@ package
 							}
 							else
 							{
-								Camera.instance.rotationZ += MOVE_PIXELS_BY;
+								Camera.instance.rotationZ += MOVE_PIXELS_BY  * 10;
 							}
                             doRedraw = true;
                             break;
@@ -173,6 +173,14 @@ package
 						case Keyboard.D:
 							_renderer.rotateLight( cube, 1 );
 							doRedraw = true;
+							break;
+						
+						case Keyboard.EQUAL:
+							Camera.PD += MOVE_PIXELS_BY * 10;
+							break;
+						
+						case Keyboard.MINUS:
+							Camera.PD -= MOVE_PIXELS_BY * 10;
 							break;
                     }
                 }

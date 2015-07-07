@@ -171,9 +171,19 @@ package
 					{
 						var vertex:VertexData = _transformVertices[i][j];
 						var vt:Vector3D = _transform.transformVector( vertex.vector );
+						
+						// transform to screen coordinates
+						vt.x = vt.x / vt.z * Camera.PD;
+						vt.y = vt.y / vt.z * Camera.PD;
+						
+						// moved from 0,0
+						vt.x += 350;
+						vt.y += 250;
+						
 						vertex.vector.x = Math.round( vt.x );
 						vertex.vector.y = Math.round( vt.y );
 						vertex.vector.z = Math.round( vt.z );
+						
 						ignoreList.push( _transformVertices[i][j].vector )
 					}
 				}

@@ -26,8 +26,6 @@ package
 		// =============================
 		// CONST
 		// =============================
-		protected static const CAMERA_VIEW:Vector3D = new Vector3D( 0, 0, 1 );
-        //protected static var GLOBAL_LIGHT_DIR:Vector3D = new Vector3D( 0, 0, 1 );
 		protected static const ROTATE_AMOUNT:int = 5;
 		
 		/*=========================================================================================

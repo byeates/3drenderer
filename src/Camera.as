@@ -1,6 +1,5 @@
 package
 {
-	import flash.geom.Matrix;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
@@ -34,6 +33,7 @@ package
 		// CONST
 		// =============================
 		public static const FOV	:Number = 60;
+		public static var 	PD	:int = 1000;
 		
 		/*=========================================================================================
 		CONSTRUCTOR
@@ -63,7 +63,7 @@ package
 			
 			// translate in to viewport
 			mat.appendScale( 50, 50, 1 );
-			mat.appendTranslation( 350, 250, 0 );
+			//mat.appendTranslation( 350, 250, 0 );
 			return mat;
 		}
 		
