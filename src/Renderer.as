@@ -4,6 +4,7 @@ package
 	import flash.display.Sprite;
 	import flash.geom.Point;
 	import flash.geom.Vector3D;
+	import flash.utils.getTimer;
 	
 	
 	/**
@@ -23,6 +24,13 @@ package
 		public var ambience:Number = 0.1;
 		public var lightRotation:Number = 0;
 		
+		public var setPixelCount:Number = 0;
+		
+		public var bitData:Vector.<uint>;
+		
+		public var useBitData:Boolean;
+		
+		private var _beginTime:Number;
 		// =============================
 		// CONST
 		// =============================
@@ -34,6 +42,7 @@ package
 		public function Renderer( canvas:BitmapData )
 		{
 			this.canvas = canvas;
+			bitData = new Vector.<uint>( canvas.width * canvas.height, true );
 		}
 
 		public function cull( object:Object3D ):Vector.<Vector.<VertexData>>
@@ -90,10 +99,13 @@ package
         public function renderObject( object:Object3D ):void
         {
 			var triangles:Vector.<Vector.<VertexData>> = cull( object );
+			_beginTime = getTimer();
 			for ( var i:int=0; i < triangles.length; ++i )
 			{
 				render( triangles[i], object );
 			}
+			trace( "RENDERED SHAPE: " + ( getTimer() - _beginTime ));
+			bitData = new Vector.<uint>( canvas.width * canvas.height, true );
 		}
 		
 		protected function render( triangle:Vector.<VertexData>, object3d:Object3D ):void
@@ -103,6 +115,7 @@ package
 			{
 				return;
 			}
+			
 			var order:Vector.<VertexData> = new Vector.<VertexData>();
 			order.push( triangle[0] );
 			order.push( triangle[1] );
@@ -224,11 +237,23 @@ package
 				var uvy:Number = (uvright.y - uvleft.y) / w;
 				var uv:Point = new Point( uvleft.x, uvleft.y );
 				
+				var tsx:int = Math.round( sx );
+				
 				var i:int = 0;
 				while( i != dist )
 				{
                     var color:Number = triangle[0].getUVPixel( uv.x, uv.y );
-                    canvas.setPixel( sx + i, sy, applyLight( color, gl_current ));
+					
+					if ( useBitData )
+					{
+						bitData[ int( sy * canvas.width + sx + i ) ] = applyLight( color, gl_current );
+					}
+					else
+					{
+						canvas.setPixel( tsx + i, sy, applyLight( color, gl_current ) );
+					}
+					
+					setPixelCount++;
 					i += it;
 					
 					xvd.red += rx;
@@ -259,10 +284,22 @@ package
 					gl_stepab = (cDot - bDot) / h;
 				}
 			}
+			
+			
 			triangle[0] = order[0];
 			triangle[1] = order[1];
 			triangle[2] = order[2];
+			
+			if ( useBitData )
+			{
+				renderBitData();
+			}
  		}
+		
+		protected function renderBitData():void
+		{
+			canvas.setVector( canvas.rect, bitData );
+		}
 
         /** applyLight - returns color multiplied by ambient light */
 		protected function applyLight( color:uint, strength:Number ):uint

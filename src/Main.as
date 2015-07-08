@@ -8,13 +8,15 @@ package
 	import flash.events.MouseEvent;
 	import flash.geom.Vector3D;
 	import flash.ui.Keyboard;
+	import flash.utils.getTimer;
+	import flashx.textLayout.elements.BreakElement;
 	
 	/**
 	 * ...
 	 * @author Bennett Yeates
 	 * 
 	 * */
-	[SWF(frameRate="30", width="700", height="500", backgroundColor="#000000")]
+	[SWF(frameRate="60", width="700", height="500", backgroundColor="#000000")]
 	public class Main extends Sprite
 	{
 		/*=========================================================================================
@@ -46,6 +48,10 @@ package
 		private static const GRID_COLUMN_SIZE:int = 25;
 		private static const GRID_ROW_SIZE:int = 25;
 		private static const MOVE_PIXELS_BY:Number = 1;
+		private static const SECONDS_MS:int = 1000;
+		
+		private var _beginTime:Number;
+		private var _frames:int;
 
 		/*=========================================================================================
 		CONSTRUCTOR
@@ -77,6 +83,8 @@ package
 			cube.translate( 0, 0, 2000 );
 			cube.updateTransformVertices();
 			_renderer.renderObject( cube );
+			
+			_beginTime = getTimer();
 		}
 		
 		protected function onKeyDown( e:KeyboardEvent ):void
@@ -101,6 +109,8 @@ package
 		protected function update(event:Event):void
 		{
             var doRedraw:Boolean;
+			_frames++;
+			
             for ( var key:String in _keys )
             {
                 if ( _keys[ key ] === true )
@@ -182,9 +192,25 @@ package
 						case Keyboard.MINUS:
 							Camera.PD -= MOVE_PIXELS_BY * 10;
 							break;
+						
+						case Keyboard.NUMPAD_1:
+							_renderer.useBitData = !_renderer.useBitData;
+							break;
                     }
                 }
             }
+			
+			// display frame count
+			var currentTime:Number = getTimer();
+			if ( currentTime - _beginTime >= SECONDS_MS )
+			{
+				/*trace( "FRAMES: " + _frames, "setPixel calls: " + _renderer.setPixelCount, 
+					"Using vector data:  " + _renderer.useBitData );*/
+				
+				_frames = 0;
+				_beginTime = currentTime;
+			}
+			_renderer.setPixelCount = 0;
 			
 			cube.rotationY += 5;
 			cube.updateTransformVertices();
