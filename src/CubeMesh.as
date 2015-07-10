@@ -146,18 +146,6 @@ package
 			sharedVertices[ triangles[4][2].vector ] = triangles[4][2].vector.clone();
 		}
 
-		override public function lookup( vector:Vector3D ):Vector3D
-		{
-			for ( var vec:* in sharedVertices )
-			{
-				if ( vec == vector )
-				{
-					return sharedVertices[ vec ];
-				}
-			}
-			return null;
-		}
-
 		override public function setUVData( texture:Bitmap ):void
         {
             for (var i:int = 0; i < triangles.length-1; i += 2)

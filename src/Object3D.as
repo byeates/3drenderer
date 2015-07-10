@@ -152,7 +152,7 @@ package
 			_transform.prependRotation( _rotationY, Vector3D.Y_AXIS );
 			_transform.prependRotation( _rotationZ, Vector3D.Z_AXIS );
 			
-			_transform = Camera.instance.toCamera( _transform );
+			_transform = Camera.instance.toCamera( this );
 			//trace( _transform.transformVector( new Vector3D ) );
 			//trace( _transform.transformVector( new Vector3D ) );
 			
@@ -221,6 +221,11 @@ package
 			_lights[ 0 ].x = x;
 			_lights[ 0 ].y = y;
 			_lights[ 0 ].z = z;
+		}
+		
+		public function get transform():Matrix3D
+		{
+			return _transform;
 		}
 		
 		/** returns the list of vertex data according to the transforms */
@@ -318,5 +323,20 @@ package
         {
             _depth = value;
         }
+		
+		public function get scaleX():Number
+		{
+			return _scaleX;
+		}
+		
+		public function get scaleY():Number
+		{
+			return _scaleY;
+		}
+		
+		public function get scaleZ():Number
+		{
+			return _scaleZ;
+		}
     }
 }

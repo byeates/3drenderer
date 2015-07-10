@@ -1,6 +1,5 @@
 package
 {
-	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -9,7 +8,6 @@ package
 	import flash.geom.Vector3D;
 	import flash.ui.Keyboard;
 	import flash.utils.getTimer;
-	import flashx.textLayout.elements.BreakElement;
 	
 	/**
 	 * ...
@@ -26,7 +24,9 @@ package
 		// PUBLIC
 		// =============================
 		public var cube:Object3D;
-		
+		public var wall:Object3D;
+		public var floor:Object3D;
+
 		// =============================
 		// PROTECTED
 		// =============================
@@ -47,7 +47,7 @@ package
 		private static const GRID_LINE_COLOR:int = 0x333333;
 		private static const GRID_COLUMN_SIZE:int = 25;
 		private static const GRID_ROW_SIZE:int = 25;
-		private static const MOVE_PIXELS_BY:Number = 1;
+		private static const MOVE_PIXELS_BY:Number = 0.1;
 		private static const SECONDS_MS:int = 1000;
 		
 		private var _beginTime:Number;
@@ -64,9 +64,10 @@ package
 			createGrid();
             _keys = {};
 
-			addChild( new Bitmap( _canvas ) );
+			//addChild( new Bitmap( _canvas ) );
 
 			_renderer = new Renderer( _canvas );
+			_renderer.sprite = this;
 
 			addEventListener( Event.ENTER_FRAME, update );
             stage.addEventListener( KeyboardEvent.KEY_DOWN, onKeyDown );
@@ -74,16 +75,33 @@ package
 			stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
 			stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 
-			var mesh:MeshData = new CubeMesh();
-			mesh.setUVData( Textures.getMap( "brick" ) );
+			var cubeMesh:MeshData = new CubeMesh();
+			cubeMesh.setUVData( Textures.getMap( "brick" ) );
 
-			cube = new Object3D( mesh );
+			cube = new Object3D( cubeMesh );
 			cube.addLightSource( new Vector3D( 0, 0, 1 ) );
-			//cube.scale( 50, 50, 1 );
+			
+			var planeMesh:MeshData = new PlaneMesh();
+			planeMesh.setUVData( Textures.getMap( "floor" ) );
+			
+			cube.scale( 50, 50, 1 );
 			cube.translate( 0, 0, 2000 );
 			cube.updateTransformVertices();
-			_renderer.renderObject( cube );
 			
+			wall = new Object3D( planeMesh );
+			wall.translate( 0, 0, 2000 );
+			wall.scale( stage.stageWidth, stage.stageHeight, 1 );
+			wall.updateTransformVertices();
+
+			floor = new Object3D( planeMesh );
+			floor.translate( 0, 0, 2000 );
+			floor.scale( stage.stageWidth, stage.stageHeight, 1 );
+			floor.rotationX = 90;
+			floor.updateTransformVertices();
+			
+			_renderer.renderObject( floor );
+			_renderer.renderObject( wall );
+			_renderer.renderObject( cube );
 			_beginTime = getTimer();
 		}
 		
@@ -120,11 +138,11 @@ package
                         case Keyboard.DOWN:
 							if ( _isMouseDown )
 							{
-								Camera.instance.y -= MOVE_PIXELS_BY;
+								Camera.instance.rotationY -= MOVE_PIXELS_BY;
 							}
 							else
 							{
-                            	Camera.instance.rotationZ -= MOVE_PIXELS_BY * 10;
+                            	Camera.instance.y -= MOVE_PIXELS_BY;
 							}
                             doRedraw = true;
                             break;
@@ -132,11 +150,11 @@ package
                         case Keyboard.UP:
 							if ( _isMouseDown )
 							{
-								Camera.instance.y += MOVE_PIXELS_BY;
+								Camera.instance.rotationY += MOVE_PIXELS_BY;
 							}
 							else
 							{
-								Camera.instance.rotationZ += MOVE_PIXELS_BY  * 10;
+								Camera.instance.y += MOVE_PIXELS_BY;
 							}
                             doRedraw = true;
                             break;
@@ -160,7 +178,7 @@ package
 							}
 							else
 							{
-								Camera.instance.x += MOVE_PIXELS_BY;								
+								Camera.instance.x += MOVE_PIXELS_BY;
 							}
                             doRedraw = true;
                             break;
@@ -186,15 +204,15 @@ package
 							break;
 						
 						case Keyboard.EQUAL:
-							Camera.PD += MOVE_PIXELS_BY * 10;
+							Camera.PD += MOVE_PIXELS_BY * 300;
 							break;
 						
 						case Keyboard.MINUS:
-							Camera.PD -= MOVE_PIXELS_BY * 10;
+							Camera.PD -= MOVE_PIXELS_BY * 300;
 							break;
 						
 						case Keyboard.NUMPAD_1:
-							_renderer.useBitData = !_renderer.useBitData;
+							resetCamera();
 							break;
                     }
                 }
@@ -214,12 +232,29 @@ package
 			
 			cube.rotationY += 5;
 			cube.updateTransformVertices();
+			
+			floor.updateTransformVertices();
+			wall.updateTransformVertices();
 			redraw();
+
+			//Camera.instance.rotationX += 0.1;
         }
+
+		private function resetCamera():void
+		{
+			Camera.instance.x = 0;
+			Camera.instance.y = 0;
+			Camera.instance.z = 0;
+			Camera.instance.rotationX = 0;
+			Camera.instance.rotationY = 0;
+			Camera.instance.rotationZ = 0;
+		}
 
 		private function redraw():void
 		{
-			_renderer.clear();
+			this.graphics.clear();
+			_renderer.renderObject( floor );
+			_renderer.renderObject( wall );
 			_renderer.renderObject( cube );
 		}
 		

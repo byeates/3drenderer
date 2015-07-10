@@ -44,6 +44,13 @@ package
 
 		public function lookup( vector:Vector3D ):Vector3D
 		{
+			for ( var vec:* in sharedVertices )
+			{
+				if ( vec == vector )
+				{
+					return sharedVertices[ vec ];
+				}
+			}
 			return null;
 		}
 	}

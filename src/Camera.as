@@ -51,7 +51,7 @@ package
 			this.z = z;
 		}
 		
-		public function toCamera( objectT:Matrix3D ):Matrix3D
+		public function toCamera( object3d:Object3D ):Matrix3D
 		{
 			var mat:Matrix3D = new Matrix3D();
 			mat.prependRotation( instance.rotationX, Vector3D.X_AXIS );
@@ -59,10 +59,10 @@ package
 			mat.prependRotation( instance.rotationZ, Vector3D.Z_AXIS );
 			mat.appendTranslation( instance.x, instance.y, instance.z );
 			mat.invert();
-			mat.prepend( objectT );
+			mat.prepend( object3d.transform );
 			
 			// translate in to viewport
-			mat.appendScale( 50, 50, 1 );
+			mat.appendScale( object3d.scaleX, object3d.scaleY, 1 );
 			//mat.appendTranslation( 350, 250, 0 );
 			return mat;
 		}

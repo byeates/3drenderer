@@ -21,6 +21,7 @@ package
 		// PUBLIC
 		// =============================
 		public var canvas:BitmapData;
+		public var sprite:Sprite;
 		public var ambience:Number = 0.1;
 		public var lightRotation:Number = 0;
 		
@@ -93,7 +94,7 @@ package
 		
 		public function clear():void
 		{
-            canvas.fillRect( canvas.rect, 0 );
+            //canvas.fillRect( canvas.rect, 0 );
         }
 
         public function renderObject( object:Object3D ):void
@@ -104,7 +105,7 @@ package
 			{
 				render( triangles[i], object );
 			}
-			trace( "RENDERED SHAPE: " + ( getTimer() - _beginTime ));
+			//trace( "RENDERED SHAPE: " + ( getTimer() - _beginTime ));
 			bitData = new Vector.<uint>( canvas.width * canvas.height, true );
 		}
 		
@@ -115,6 +116,31 @@ package
 			{
 				return;
 			}
+			
+			var vertices:Vector.<Number> = new <Number>
+			[
+					triangle[0].x,
+					triangle[0].y,
+					triangle[1].x,
+					triangle[1].y,
+					triangle[2].x,
+					triangle[2].y
+			];
+			
+			var uvCoords:Vector.<Number> = new <Number>
+			[
+				triangle[0].u,
+				triangle[0].v,
+				triangle[1].u,
+				triangle[1].v,
+				triangle[2].u,
+				triangle[2].v
+			];
+
+			sprite.graphics.beginBitmapFill( triangle[0].uvMap );
+			sprite.graphics.drawTriangles( vertices, null, uvCoords );
+
+			return;
 			
 			var order:Vector.<VertexData> = new Vector.<VertexData>();
 			order.push( triangle[0] );
