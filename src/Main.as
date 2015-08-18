@@ -2,12 +2,17 @@ package
 {
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
-	import flash.events.Event;
+import flash.display.StageScaleMode;
+import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.geom.Vector3D;
-	import flash.ui.Keyboard;
-	import flash.utils.getTimer;
+import flash.net.URLLoader;
+import flash.net.URLLoaderDataFormat;
+import flash.net.URLRequest;
+import flash.ui.Keyboard;
+import flash.utils.ByteArray;
+import flash.utils.getTimer;
 	
 	/**
 	 * ...
@@ -53,11 +58,22 @@ package
 		private var _beginTime:Number;
 		private var _frames:int;
 
+		private var models:Object =
+		{
+				cube: "../../../models/cube.txt"
+		};
+
+		private var modelData:Object = {};
+
 		/*=========================================================================================
 		CONSTRUCTOR
 		=========================================================================================*/
 		public function Main()
 		{
+			loadModels();
+
+			stage.scaleMode = StageScaleMode.SHOW_ALL;
+
 			_canvas = new BitmapData( stage.stageWidth, stage.stageHeight, false, 0 );
 			
 			// comment this out if grid lines are not wanted
@@ -99,10 +115,49 @@ package
 			floor.rotationX = 90;
 			floor.updateTransformVertices();
 			
-			_renderer.renderObject( floor );
-			_renderer.renderObject( wall );
+			//_renderer.renderObject( floor );
+			//_renderer.renderObject( wall );
 			_renderer.renderObject( cube );
 			_beginTime = getTimer();
+		}
+
+		protected function loadModels():void
+		{
+			for ( var model:String in models )
+			{
+				var loader:URLLoader = new URLLoader()
+				//loader.dataFormat = URLLoaderDataFormat.BINARY;
+				loader.addEventListener( Event.COMPLETE, function(e:Event):void
+				{
+					/*var byte:ByteArray = new ByteArray();
+					byte.writeBytes( e.currentTarget.data );
+					byte.position = 0;
+					trace( byte.readUTF() );*/
+					// string of vertex information
+					modelData[ model ] = parseModel( String( e.currentTarget.data ) );
+				});
+				loader.load( new URLRequest( models[ model ] ) );
+			}
+		}
+
+		protected function parseModel( data:String ):Vector.<Vector3D>
+		{
+			trace( data );
+			var modelData:Array = data.split( "\n" );
+			var vertices:Vector.<Vector3D> = new Vector.<Vector3D>();
+
+			for ( var i:int; i < modelData.length; ++i )
+			{
+				if ( modelData[i].search( /v\s+([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)/g ) != -1 )
+				{
+					var vx:Number = Number( modelData[i].replace( /v\s+([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)/g, "$1" ) );
+					var vy:Number = Number( modelData[i].replace( /v\s+([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)/g, "$2" ) );
+					var vz:Number = Number( modelData[i].replace( /v\s+([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)/g, "$3" ) );
+					vertices.push( new Vector3D( vx, vy, vz ) );
+				}
+			}
+
+			return vertices;
 		}
 		
 		protected function onKeyDown( e:KeyboardEvent ):void
@@ -253,8 +308,8 @@ package
 		private function redraw():void
 		{
 			this.graphics.clear();
-			_renderer.renderObject( floor );
-			_renderer.renderObject( wall );
+			//_renderer.renderObject( floor );
+			//_renderer.renderObject( wall );
 			_renderer.renderObject( cube );
 		}
 		
