@@ -12,6 +12,7 @@ import flash.net.URLLoaderDataFormat;
 import flash.net.URLRequest;
 import flash.ui.Keyboard;
 import flash.utils.ByteArray;
+import flash.utils.Dictionary;
 import flash.utils.getTimer;
 	
 	/**
@@ -58,9 +59,11 @@ import flash.utils.getTimer;
 		private var _beginTime:Number;
 		private var _frames:int;
 
+		private var _models:Vector.<Object3D> = new Vector.<Object3D>();
+
 		private var models:Object =
 		{
-				cube: "../../../models/cube.txt"
+				cube: "../../../models/cube_uv.txt"
 		};
 
 		private var modelData:Object = {};
@@ -117,7 +120,7 @@ import flash.utils.getTimer;
 			
 			//_renderer.renderObject( floor );
 			//_renderer.renderObject( wall );
-			_renderer.renderObject( cube );
+			//_renderer.renderObject( cube );
 			_beginTime = getTimer();
 		}
 
@@ -129,35 +132,74 @@ import flash.utils.getTimer;
 				//loader.dataFormat = URLLoaderDataFormat.BINARY;
 				loader.addEventListener( Event.COMPLETE, function(e:Event):void
 				{
-					/*var byte:ByteArray = new ByteArray();
-					byte.writeBytes( e.currentTarget.data );
-					byte.position = 0;
-					trace( byte.readUTF() );*/
 					// string of vertex information
 					modelData[ model ] = parseModel( String( e.currentTarget.data ) );
+
+					var object:Object3D = new Object3D( modelData[ model ] );
+					object.scale( 50, 50, 1 );
+					object.translate( 0, 0, 2000 );
+					object.updateTransformVertices();
+
+					_renderer.renderObject( object );
+
+					_models.push( object );
+
 				});
 				loader.load( new URLRequest( models[ model ] ) );
 			}
 		}
 
-		protected function parseModel( data:String ):Vector.<Vector3D>
+		protected function parseModel( data:String ):MeshData
 		{
-			trace( data );
 			var modelData:Array = data.split( "\n" );
-			var vertices:Vector.<Vector3D> = new Vector.<Vector3D>();
+			var vertices:Vector.<Vector3D> = parseVertices( modelData[1] );
+			var triangles:Vector.<Vector.<VertexData>>;
 
-			for ( var i:int; i < modelData.length; ++i )
+			triangles = createTrisFromData( modelData, vertices );
+
+			var mesh:CustomMesh = new CustomMesh();
+			mesh.createMesh( vertices, triangles );
+			mesh.setUVData( null );
+
+			return mesh;
+		}
+
+		protected function parseVertices( unparsedData:String ):Vector.<Vector3D>
+		{
+			var splitData:Array;
+			unparsedData = unparsedData.replace( /.*VERTICES.*\[(.*)\]/gm, "$1" );
+			splitData = unparsedData.replace(/[\r\n]+/g, "").split("),");
+
+			var vertices:Vector.<Vector3D> = new Vector.<Vector3D>();
+			for ( var i:int=0; i < splitData.length; ++i )
 			{
-				if ( modelData[i].search( /v\s+([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)/g ) != -1 )
-				{
-					var vx:Number = Number( modelData[i].replace( /v\s+([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)/g, "$1" ) );
-					var vy:Number = Number( modelData[i].replace( /v\s+([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)/g, "$2" ) );
-					var vz:Number = Number( modelData[i].replace( /v\s+([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)/g, "$3" ) );
-					vertices.push( new Vector3D( vx, vy, vz ) );
-				}
+				var vec:String = splitData[i].replace( /.*Vector\(+(.*)\)+/g, "$1" );
+				var cords:Array = vec.split( "," );
+				vertices.push( new Vector3D( cords[0], cords[1], cords[2] ) );
+			}
+			return vertices;
+		}
+
+		protected function createTrisFromData( modelData:Array, vertices:Vector.<Vector3D> ):Vector.<Vector.<VertexData>>
+		{
+			var triangles:Vector.<Vector.<VertexData>> = new Vector.<Vector.<VertexData>>();
+			var indices:Array = modelData[0].replace( /.*\[(.*.)\]/gm, "$1" ).split("|");
+			indices[0] = indices[0].replace( /INDICES\:([\r\n]+)?/gm , "");
+
+			for ( var i:int; i < indices.length; ++i )
+			{
+				var tri:Array = indices[i].replace( /\s+/g, "" ).split(",");
+
+				// TODO: check to see if the vertexdata was already create, if so clone it, otherwise
+				// create a new one
+				/*triangles.push(
+					new <VertexData>
+					[
+
+					]);*/
 			}
 
-			return vertices;
+			return triangles;
 		}
 		
 		protected function onKeyDown( e:KeyboardEvent ):void
@@ -277,20 +319,27 @@ import flash.utils.getTimer;
 			var currentTime:Number = getTimer();
 			if ( currentTime - _beginTime >= SECONDS_MS )
 			{
-				/*trace( "FRAMES: " + _frames, "setPixel calls: " + _renderer.setPixelCount, 
-					"Using vector data:  " + _renderer.useBitData );*/
+				//*trace( "FRAMES: " + _frames, "setPixel calls: " + _renderer.setPixelCount,
+					//"Using vector data:  " + _renderer.useBitData );//*
 				
 				_frames = 0;
 				_beginTime = currentTime;
 			}
 			_renderer.setPixelCount = 0;
 			
-			cube.rotationY += 5;
-			cube.updateTransformVertices();
+			//cube.rotationY += 5;
+			//cube.updateTransformVertices();
 			
-			floor.updateTransformVertices();
-			wall.updateTransformVertices();
+			//floor.updateTransformVertices();
+			//wall.updateTransformVertices();
+
 			redraw();
+			for ( var i:int; i < _models.length; ++i )
+			{
+				_models[i].updateTransformVertices();
+				_models[i].rotationY += 5;
+				_renderer.renderObject( _models[i] );
+			}
 
 			//Camera.instance.rotationX += 0.1;
         }
@@ -310,7 +359,8 @@ import flash.utils.getTimer;
 			this.graphics.clear();
 			//_renderer.renderObject( floor );
 			//_renderer.renderObject( wall );
-			_renderer.renderObject( cube );
+			//_renderer.renderObject( cube );
+			//_renderer.renderObject()
 		}
 		
 		private function createGrid():void
